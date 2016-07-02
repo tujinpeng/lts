@@ -10,23 +10,59 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>war</packaging>
     <artifactId>lts-admin</artifactId>
-
+	
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <path>/</path>
-                    <port>8081</port>
-                    <server>tomcat</server>
-                    <warFile>lts-admin.war</warFile>
-                    <uriEncoding>utf-8</uriEncoding>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+      	<finalName>lts-admin</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/config</directory>
+				<excludes>
+					<exclude>*.properties</exclude>
+				</excludes>
+			</resource>
+
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+
+			<resource>
+				<directory>src/main/config</directory>
+				<includes>
+					<include>${p.filtering.resource}</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/main/config</directory>
+			</testResource>
+		</testResources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<archiveClasses>${p.archiveClasses}</archiveClasses>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
     <dependencies>
         <dependency>
