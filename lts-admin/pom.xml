@@ -15,7 +15,7 @@
       	<finalName>lts-admin</finalName>
 		<resources>
 			<resource>
-				<directory>src/main/config</directory>
+				<directory>src/main/resources</directory>
 				<excludes>
 					<exclude>*.properties</exclude>
 				</excludes>
@@ -30,9 +30,16 @@
 			</resource>
 
 			<resource>
-				<directory>src/main/config</directory>
+				<directory>src/main/resources</directory>
 				<includes>
 					<include>${p.filtering.resource}</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>${p.filtering.resource1}</include>
 				</includes>
 				<filtering>true</filtering>
 			</resource>
@@ -40,7 +47,7 @@
 		</resources>
 		<testResources>
 			<testResource>
-				<directory>src/main/config</directory>
+				<directory>src/main/resources</directory>
 			</testResource>
 		</testResources>
 		<plugins>
@@ -251,4 +258,14 @@
             <artifactId>mongo-java-driver</artifactId>
         </dependency>
     </dependencies>
+    <properties>
+				<!-- pom properties -->
+				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+				<p.archiveClasses>false</p.archiveClasses>
+				<p.filtering.resource>*.properties</p.filtering.resource>
+    			<p.filtering.resource1>*.cfg</p.filtering.resource1>
+    			
+    			<p.console.username>admin</p.console.username>
+    			<p.console.password>admin123</p.console.password>
+    </properties>
 </project>
