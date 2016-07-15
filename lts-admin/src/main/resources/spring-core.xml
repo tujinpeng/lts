@@ -30,17 +30,6 @@
     <bean class="com.github.ltsopensource.admin.support.I18nManager">
         <constructor-arg name="messageSource" ref="messageSource"/>
     </bean>
-    <bean id="propertyConfigurer"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
-			<list>
-				<value>classpath:const.properties</value>
-				<value>classpath:jms.properties</value>
-				<value>classpath:memcached.properties</value>
-				<value>classpath:dubbo.properties</value>
-			</list>
-		</property>
-	</bean>
 
     <bean id="appContext" class="com.github.ltsopensource.admin.support.BackendAppContextFactoryBean"/>
 
