@@ -347,6 +347,14 @@
             </build>
         </profile>
     </profiles>
+    
+      <distributionManagement>
+         <snapshotRepository>
+             <id>central</id>
+             <name>Nexus Snapshot Repository</name>
+             <url>http://192.168.0.101:8081/nexus/content/groups/public/</url>
+         </snapshotRepository>
+      </distributionManagement>
 
     <licenses>
         <license>
