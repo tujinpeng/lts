@@ -349,12 +349,17 @@
     </profiles>
     
       <distributionManagement>
-         <snapshotRepository>
-             <id>central</id>
-             <name>Nexus Snapshot Repository</name>
-             <url>http://192.168.0.101:8081/nexus/content/groups/public/</url>
-         </snapshotRepository>
-      </distributionManagement>
+			<repository>
+				<id>releases</id>
+				<name>Nexus Release Repository</name>
+				<url>http://192.168.0.101:8081/nexus/content/repositories/releases/</url>
+			</repository>
+			<snapshotRepository>
+				<id>snapshots</id>
+				<name>Nexus Snapshot Repository</name>
+				<url>http://192.168.0.101:8081/nexus/content/repositories/snapshots/</url>
+			</snapshotRepository>
+		</distributionManagement>
 
     <licenses>
         <license>
