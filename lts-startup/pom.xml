@@ -165,7 +165,7 @@
                     <artifactId>lts-monitor</artifactId>
                     <version>${project.parent.version}</version>
                 </dependency>
-                <dependency>
+               <!--  <dependency>
                     <groupId>com.github.ltsopensource</groupId>
                     <artifactId>lts-tasktracker</artifactId>
                     <version>${project.parent.version}</version>
@@ -174,7 +174,7 @@
                     <groupId>com.github.ltsopensource</groupId>
                     <artifactId>lts-spring</artifactId>
                     <version>${project.parent.version}</version>
-                </dependency>
+                </dependency> -->
                 <dependency>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
@@ -269,7 +269,7 @@
                 <configuration>
                     <finalName>lts</finalName>
                     <descriptors>
-                        <descriptor>release.xml</descriptor>
+                        <descriptor>release_jobTracker.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
