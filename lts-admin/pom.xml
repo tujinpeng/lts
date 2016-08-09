@@ -261,14 +261,27 @@
     </dependencies>
 
     <properties>
-                <!-- pom properties -->
-                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-                <p.archiveClasses>false</p.archiveClasses>
-                <p.filtering.resource>*.properties</p.filtering.resource>
-                <p.filtering.resource1>*.cfg</p.filtering.resource1>
-                
-                <p.console.username>admin</p.console.username>
-                <p.console.password>admin123</p.console.password>
+        <!-- pom properties -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <p.archiveClasses>false</p.archiveClasses>
+        <p.filtering.resource>*.properties</p.filtering.resource>
+        <p.filtering.resource1>*.cfg</p.filtering.resource1>
+        
+        <p.console.username>admin</p.console.username>
+        <p.console.password>admin123</p.console.password>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>development</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <p.rootLogger>INFO, A1</p.rootLogger>
+                <p.loger.lever.ibatis>INFO</p.loger.lever.ibatis>
+                <p.loger.lever.sql>DEBUG</p.loger.lever.sql>
+            </properties>
+        </profile>
+    </profiles>
 </project>
