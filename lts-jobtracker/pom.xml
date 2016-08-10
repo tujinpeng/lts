@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.github.ltsopensource</groupId>
             <artifactId>lts-core</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.9-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
