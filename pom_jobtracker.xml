@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>lts-jobtracker</module>
+        <module>lts-startup</module>
     </modules>
 
 </project>
