@@ -259,8 +259,9 @@
                 </dependency>
             </dependencies>
         </profile>
+        <!-- jdbc 配置 -->
         <profile>
-            <id>development</id>
+            <id>integration_test</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -277,15 +278,42 @@
             	</p.lts.jobtracker.jdbc.url>
 				<p.lts.jobtracker.jdbc.username>root</p.lts.jobtracker.jdbc.username>
 				<p.lts.jobtracker.jdbc.password>123456</p.lts.jobtracker.jdbc.password>
-            
+                
+            </properties>
+        </profile>
+        <profile>
+            <id>development</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+
                 <!-- log4j 配置 -->
                 <p.rootLogger>INFO, A1</p.rootLogger>
                 <p.loger.lever.ibatis>INFO</p.loger.lever.ibatis>
                 <p.loger.lever.sql>DEBUG</p.loger.lever.sql>
                 
                 <!-- lts zk 服务配置 -->
-				<p.zk.cluster.name>tnt_msg_cluster</p.zk.cluster.name> <!-- 服务集群 -->
-				<p.zk.registry.address>zookeeper://127.0.0.1:2181</p.zk.registry.address><!-- 注册地址 -->
+                <p.zk.cluster.name>tnt_msg_cluster</p.zk.cluster.name> <!-- 服务集群 -->
+                <p.zk.registry.address>zookeeper://127.0.0.1:2181</p.zk.registry.address><!-- 注册地址 -->
+                
+            </properties>
+        </profile>
+        <profile>
+            <id>test_dist_207</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+
+                <!-- log4j 配置 -->
+                <p.rootLogger>INFO, A1</p.rootLogger>
+                <p.loger.lever.ibatis>INFO</p.loger.lever.ibatis>
+                <p.loger.lever.sql>DEBUG</p.loger.lever.sql>
+                
+                <!-- lts zk 服务配置 -->
+                <p.zk.cluster.name>tnt_msg_cluster</p.zk.cluster.name> <!-- 服务集群 -->
+                <p.zk.registry.address>zookeeper://10.113.10.207:2181</p.zk.registry.address><!-- 注册地址 -->
                 
             </properties>
         </profile>
