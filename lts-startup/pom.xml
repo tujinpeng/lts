@@ -248,6 +248,20 @@
                     <artifactId>leveldbjni-all</artifactId>
                 </dependency>
             </dependencies>
+
+            <properties>
+
+                <!-- log4j 配置 -->
+                <p.rootLogger>INFO, A1</p.rootLogger>
+                <p.loger.lever.ibatis>INFO</p.loger.lever.ibatis>
+                <p.loger.lever.sql>DEBUG</p.loger.lever.sql>
+                
+                <!-- lts zk 服务配置 -->
+                <p.zk.cluster.name>tnt_msg_cluster</p.zk.cluster.name> <!-- 服务集群 -->
+                <p.zk.registry.address>zookeeper://127.0.0.1:2181</p.zk.registry.address><!-- 注册地址 -->
+                
+            </properties>
+        
         </profile>
         <profile>
             <id>lts-admin</id>
@@ -262,9 +276,6 @@
         <!-- jdbc 配置 -->
         <profile>
             <id>integration_test</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
             
             	<p.ltsadmin.jdbc.url>
@@ -281,29 +292,9 @@
                 
             </properties>
         </profile>
-        <profile>
-            <id>development</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-
-                <!-- log4j 配置 -->
-                <p.rootLogger>INFO, A1</p.rootLogger>
-                <p.loger.lever.ibatis>INFO</p.loger.lever.ibatis>
-                <p.loger.lever.sql>DEBUG</p.loger.lever.sql>
-                
-                <!-- lts zk 服务配置 -->
-                <p.zk.cluster.name>tnt_msg_cluster</p.zk.cluster.name> <!-- 服务集群 -->
-                <p.zk.registry.address>zookeeper://127.0.0.1:2181</p.zk.registry.address><!-- 注册地址 -->
-                
-            </properties>
-        </profile>
+        
         <profile>
             <id>test_dist_207</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
 
                 <!-- log4j 配置 -->
