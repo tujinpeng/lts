@@ -18,5 +18,37 @@
             <version>1.6.9-SNAPSHOT</version>
         </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>development</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+            
+            	<p.ltsadmin.jdbc.url>
+            		<![CDATA[jdbc:mysql://192.168.0.103:3306/tnt-ltsadmin?useUnicode=true&characterEncoding=UTF-8]]>
+            	</p.ltsadmin.jdbc.url>
+				<p.ltsadmin.jdbc.username>root</p.ltsadmin.jdbc.username>
+				<p.ltsadmin.jdbc.password>123456</p.ltsadmin.jdbc.password>
+            
+            	<p.lts.jobtracker.jdbc.url>
+            		<![CDATA[jdbc:mysql://192.168.0.103:3306/tnt-jobtracker?useUnicode=true&characterEncoding=UTF-8]]>
+            	</p.lts.jobtracker.jdbc.url>
+				<p.lts.jobtracker.jdbc.username>root</p.lts.jobtracker.jdbc.username>
+				<p.lts.jobtracker.jdbc.password>123456</p.lts.jobtracker.jdbc.password>
+            
+                <!-- log4j 配置 -->
+                <p.rootLogger>INFO, A1</p.rootLogger>
+                <p.loger.lever.ibatis>INFO</p.loger.lever.ibatis>
+                <p.loger.lever.sql>DEBUG</p.loger.lever.sql>
+                
+                <!-- lts zk 服务配置 -->
+				<p.zk.cluster.name>tnt_msg_cluster</p.zk.cluster.name> <!-- 服务集群 -->
+				<p.zk.registry.address>zookeeper://127.0.0.1:2181</p.zk.registry.address><!-- 注册地址 -->
+                
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
