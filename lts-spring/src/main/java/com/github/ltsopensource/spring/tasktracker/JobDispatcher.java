@@ -1,6 +1,7 @@
 package com.github.ltsopensource.spring.tasktracker;
 
 import com.github.ltsopensource.core.commons.utils.StringUtils;
+import com.github.ltsopensource.core.domain.Action;
 import com.github.ltsopensource.core.domain.Job;
 import com.github.ltsopensource.tasktracker.Result;
 import com.github.ltsopensource.tasktracker.runner.JobContext;
@@ -33,7 +34,8 @@ public class JobDispatcher implements JobRunner {
             jobRunner = JobRunnerHolder.getJobRunner("_LTS_DEFAULT");
 
             if (jobRunner == null) {
-                throw new JobDispatchException("Can not find JobRunner by Shard Value : [" + value + "]");
+//                throw new JobDispatchException("Can not find JobRunner by Shard Value : [" + value + "]");
+                return new Result(Action.EXECUTE_FAILED,"Can not find JobRunner by Shard Value : [" + value + "]");
             }
         }
         return jobRunner.run(jobContext);
