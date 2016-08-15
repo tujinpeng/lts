@@ -277,7 +277,11 @@
         <profile>
             <id>integration_test</id>
             <properties>
-            
+                
+                <p.jdbc.maxActive>10</p.jdbc.maxActive>
+                <p.jdbc.initSize>1</p.jdbc.initSize>
+                <p.jdbc.maxIdle>1</p.jdbc.maxIdle>
+
             	<p.ltsadmin.jdbc.url>
             		<![CDATA[jdbc:mysql://192.168.0.103:3306/tnt-ltsadmin?useUnicode=true&characterEncoding=UTF-8]]>
             	</p.ltsadmin.jdbc.url>
