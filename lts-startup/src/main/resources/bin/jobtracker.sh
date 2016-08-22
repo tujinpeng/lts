@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # JVMFLAGS JVM参数可以在这里设置
-JVMFLAGS=-Dfile.encoding=UTF-8
+JVMFLAGS='-Dfile.encoding=UTF-8 -server -Xmx10240m -Xms10240m -Xss512k -XX:PermSize=256m -XX:MaxPermSize=256m'
 
 JOB_TRACKER_HOME="${BASH_SOURCE-$0}"
 JOB_TRACKER_HOME="$(dirname "${JOB_TRACKER_HOME}")"
@@ -29,7 +29,7 @@ NODE_NAME="$1"  # zoo
 # 转化为绝对路径
 CONF_HOME="${JOB_TRACKER_HOME}/../."
 CONF_HOME="$(cd "$(dirname "${CONF_HOME}")"; pwd)"
-CONF_HOME="$CONF_HOME/conf/$NODE_NAME"
+CONF_HOME="$CONF_HOME/WEB-INF/classes/$NODE_NAME"
 
 _LTS_DAEMON_OUT="$JOB_TRACKER_HOME/../logs/jobtracker-$NODE_NAME.out"
 LTS_MAIN="com.github.ltsopensource.startup.jobtracker.JobTrackerStartup"
