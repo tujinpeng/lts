@@ -13,6 +13,10 @@ public class JobLoggerRequest extends PaginationReq {
     private String taskId;
 
     private String taskTrackerNodeGroup;
+    
+    private String bizId;
+    
+    private String eventType;
 
     private Date startLogTime;
 
@@ -57,4 +61,22 @@ public class JobLoggerRequest extends PaginationReq {
     public void setEndLogTime(Date endLogTime) {
         this.endLogTime = endLogTime;
     }
+
+	public String getBizId() {
+		return bizId;
+	}
+
+	public void setBizId(String bizId) {
+		this.bizId = bizId;
+	}
+
+	public String getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
+	}
+    
+    
 }

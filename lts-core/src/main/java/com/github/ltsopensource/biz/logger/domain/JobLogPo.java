@@ -71,6 +71,12 @@ public class JobLogPo {
     private Long repeatInterval;
 
     private Boolean depPreCycle;
+    
+    private String eventType;
+    
+    private String bizId;
+    
+    private String bizType;
 
     public JobType getJobType() {
         return jobType;
@@ -271,4 +277,30 @@ public class JobLogPo {
     public void setDepPreCycle(Boolean depPreCycle) {
         this.depPreCycle = depPreCycle;
     }
+
+	public String getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
+	}
+
+	public String getBizId() {
+		return bizId;
+	}
+
+	public void setBizId(String bizId) {
+		this.bizId = bizId;
+	}
+
+	public String getBizType() {
+		return bizType;
+	}
+
+	public void setBizType(String bizType) {
+		this.bizType = bizType;
+	}
+    
+    
 }
