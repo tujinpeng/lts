@@ -66,6 +66,10 @@ public class JobUtils {
         return StringUtils.generateUUID();
     }
 
+    public static String generateExeSeqId(JobPo jobPo){
+        return String.valueOf(jobPo.getTriggerTime());
+    }
+
     public static Job copy(Job source) {
         Job job = new Job();
         JOB_BEAN_COPIER.copyProps(source, job);
