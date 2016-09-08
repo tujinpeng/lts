@@ -78,7 +78,11 @@ public class MysqlJobLogger extends JdbcAbstractAccess implements JobLogger {
                         "rely_on_prev_cycle",
                         "repeat_count",
                         "repeated_count",
-                        "repeat_interval"
+                        "repeat_interval",
+                        "eventType",
+                        "bizId",
+                        "bizType"
+                        
                 );
     }
 
@@ -107,7 +111,10 @@ public class MysqlJobLogger extends JdbcAbstractAccess implements JobLogger {
                 jobLogPo.getDepPreCycle(),
                 jobLogPo.getRepeatCount(),
                 jobLogPo.getRepeatedCount(),
-                jobLogPo.getRepeatInterval());
+                jobLogPo.getRepeatInterval(),
+                jobLogPo.getExtParams().get("eventType"),
+                jobLogPo.getExtParams().get("bizId"),
+                jobLogPo.getExtParams().get("bizType"));
     }
 
     @Override
@@ -147,6 +154,8 @@ public class MysqlJobLogger extends JdbcAbstractAccess implements JobLogger {
                 .andOnNotEmpty("task_id = ?", request.getTaskId())
                 .andOnNotEmpty("real_task_id = ?", request.getRealTaskId())
                 .andOnNotEmpty("task_tracker_node_group = ?", request.getTaskTrackerNodeGroup())
+                .andOnNotEmpty("bizId = ?", request.getBizId())
+                .andOnNotEmpty("eventType = ?", request.getEventType())
                 .andBetween("log_time", JdbcTypeUtils.toTimestamp(request.getStartLogTime()), JdbcTypeUtils.toTimestamp(request.getEndLogTime()))
                 ;
     }

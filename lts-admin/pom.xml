@@ -5,7 +5,7 @@
     <parent>
         <artifactId>lts-parent</artifactId>
         <groupId>com.github.ltsopensource</groupId>
-        <version>1.6.9-SNAPSHOT</version>
+        <version>1.7.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>war</packaging>
@@ -67,6 +67,19 @@
                 <version>2.2</version>
                 <configuration>
                     <archiveClasses>${p.archiveClasses}</archiveClasses>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <port>9090</port>
+                    <path>/mgr</path>
+                    <uriEncoding>UTF-8</uriEncoding>
+                    <finalName>mgr</finalName>
+                    <server>tomcat7</server>
                 </configuration>
             </plugin>
         </plugins>
@@ -283,7 +296,7 @@
                 <p.jdbc.maxIdle>1</p.jdbc.maxIdle>
 
             	<p.ltsadmin.jdbc.url>
-            		<![CDATA[jdbc:mysql://192.168.0.103:3306/tnt-ltsadmin?useUnicode=true&characterEncoding=UTF-8]]>
+            		<![CDATA[jdbc:mysql://192.168.0.67:3306/tnt-jobtracker?useUnicode=true&characterEncoding=UTF-8]]>
             	</p.ltsadmin.jdbc.url>
 				<p.ltsadmin.jdbc.username>root</p.ltsadmin.jdbc.username>
 				<p.ltsadmin.jdbc.password>123456</p.ltsadmin.jdbc.password>

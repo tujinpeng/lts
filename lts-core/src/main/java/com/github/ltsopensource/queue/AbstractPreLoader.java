@@ -5,6 +5,7 @@ import com.github.ltsopensource.core.commons.concurrent.ConcurrentHashSet;
 import com.github.ltsopensource.core.commons.utils.Callable;
 import com.github.ltsopensource.core.commons.utils.CollectionUtils;
 import com.github.ltsopensource.core.commons.utils.StringUtils;
+import com.github.ltsopensource.core.constant.Constants;
 import com.github.ltsopensource.core.constant.ExtConfig;
 import com.github.ltsopensource.core.factory.NamedThreadFactory;
 import com.github.ltsopensource.core.support.NodeShutdownHook;
@@ -24,7 +25,7 @@ public abstract class AbstractPreLoader implements PreLoader {
     // 预取阀值
     private double factor;
 
-    private ConcurrentHashMap<String/*taskTrackerNodeGroup*/, JobPriorityBlockingQueue> JOB_MAP = new ConcurrentHashMap<String, JobPriorityBlockingQueue>();
+    private ConcurrentHashMap<String/*taskTrackerNodeGroup*/, JobPriorityBlockingDeque> JOB_MAP = new ConcurrentHashMap<String, JobPriorityBlockingDeque>();
 
     // 加载的信号
     private ConcurrentHashSet<String> LOAD_SIGNAL = new ConcurrentHashSet<String>();
@@ -53,20 +54,32 @@ public abstract class AbstractPreLoader implements PreLoader {
                             force = true;
                         }
 
-                        JobPriorityBlockingQueue queue = JOB_MAP.get(loadTaskTrackerNodeGroup);
+                        JobPriorityBlockingDeque queue = JOB_MAP.get(loadTaskTrackerNodeGroup);
                         if (queue == null) {
                             continue;
                         }
-                        if (force || queue.size() / loadSize < factor) {
+                        int size = queue.size();
+                        if (force || (size / (loadSize * 1.0)) < factor) {
+
+                            int needLoadSize = loadSize - size;
+                            if (force) {
+                                // 强制加载全量加载吧
+                                needLoadSize = loadSize;
+                            }
                             // load
-                            List<JobPo> loads = load(loadTaskTrackerNodeGroup, loadSize - queue.size());
+                            List<JobPo> loads = load(loadTaskTrackerNodeGroup, needLoadSize);
                             // 加入到内存中
                             if (CollectionUtils.isNotEmpty(loads)) {
                                 for (JobPo load : loads) {
-                                    // TODO 这里可以优化,对于force这种场景,可以移除执行优先级低的
                                     if (!queue.offer(load)) {
                                         // 没有成功说明已经满了
-                                        break;
+                                        if (force) {
+                                            // force场景，移除队列尾部的，插入新的
+                                            queue.pollLast();
+                                            queue.offer(load);
+                                        } else {
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -116,6 +129,25 @@ public abstract class AbstractPreLoader implements PreLoader {
         LOAD_SIGNAL.add(FORCE_PREFIX + taskTrackerNodeGroup);
     }
 
+    @Override
+    public void loadOne2First(String taskTrackerNodeGroup, String jobId) {
+        JobPo jobPo = getJob(taskTrackerNodeGroup, jobId);
+        if (jobPo == null) {
+            return;
+        }
+        JobPriorityBlockingDeque queue = getQueue(taskTrackerNodeGroup);
+        jobPo.setInternalExtParam(Constants.OLD_PRIORITY, String.valueOf(jobPo.getPriority()));
+
+        jobPo.setPriority(Integer.MIN_VALUE);
+
+        if (!queue.offer(jobPo)) {
+            queue.pollLast(); // 移除优先级最低的一个
+            queue.offer(jobPo);
+        }
+    }
+
+    protected abstract JobPo getJob(String taskTrackerNodeGroup, String jobId);
+
     /**
      * 锁定任务
      */
@@ -131,14 +163,8 @@ public abstract class AbstractPreLoader implements PreLoader {
     protected abstract List<JobPo> load(String loadTaskTrackerNodeGroup, int loadSize);
 
     private JobPo get(String taskTrackerNodeGroup) {
-        JobPriorityBlockingQueue queue = JOB_MAP.get(taskTrackerNodeGroup);
-        if (queue == null) {
-            queue = new JobPriorityBlockingQueue(loadSize);
-            JobPriorityBlockingQueue oldQueue = JOB_MAP.putIfAbsent(taskTrackerNodeGroup, queue);
-            if (oldQueue != null) {
-                queue = oldQueue;
-            }
-        }
+
+        JobPriorityBlockingDeque queue = getQueue(taskTrackerNodeGroup);
 
         if (queue.size() / loadSize < factor) {
             // 触发加载的请求
@@ -146,7 +172,31 @@ public abstract class AbstractPreLoader implements PreLoader {
                 LOAD_SIGNAL.add(taskTrackerNodeGroup);
             }
         }
-        return queue.poll();
+        JobPo jobPo = queue.poll();
+        if (jobPo != null && jobPo.getPriority() == Integer.MIN_VALUE) {
+            if (CollectionUtils.isNotEmpty(jobPo.getInternalExtParams())) {
+                if (jobPo.getInternalExtParams().containsKey(Constants.OLD_PRIORITY)) {
+                    try {
+                        int priority = Integer.parseInt(jobPo.getInternalExtParam(Constants.OLD_PRIORITY));
+                        jobPo.getInternalExtParams().remove(Constants.OLD_PRIORITY);
+                        jobPo.setPriority(priority);
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+        }
+        return jobPo;
     }
 
+    private JobPriorityBlockingDeque getQueue(String taskTrackerNodeGroup) {
+        JobPriorityBlockingDeque queue = JOB_MAP.get(taskTrackerNodeGroup);
+        if (queue == null) {
+            queue = new JobPriorityBlockingDeque(loadSize);
+            JobPriorityBlockingDeque oldQueue = JOB_MAP.putIfAbsent(taskTrackerNodeGroup, queue);
+            if (oldQueue != null) {
+                queue = oldQueue;
+            }
+        }
+        return queue;
+    }
 }

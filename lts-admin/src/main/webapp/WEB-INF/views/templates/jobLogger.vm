@@ -40,6 +40,20 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">业务ID</label>
+
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" name="bizId" value="$!bizId"
+                                       placeholder="请输入你提交的业务ID(bizId)">
+                            </div>
+                            <label class="col-sm-1 control-label">eventType</label>
+
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" name="eventType" value="$!eventType"
+                                       placeholder="">
+                            </div>
+                        </div>
                         <div class="form-group row">
                             <label class="col-sm-2 control-label">时间</label>
 
@@ -105,8 +119,11 @@
             <th data-hide="all">优先级</th>
             <th data-hide="all">执行时间</th>
             <th>Cron表达式</th>
+            <th>eventType</th>
             <th data-hide="all">反馈客户端</th>
             <th data-hide="all">用户参数</th>
+            <th data-hide="all">bizId</th>
+            <th data-hide="all">bizType</th>
             <th data-hide="all">内容</th>
         </tr>
         </thead>
@@ -128,8 +145,11 @@
             <td>{{row.priority}}</td>
             <td>{{row.triggerTime | dateFormat:'yyyy-MM-dd HH:mm:ss'}}</td>
             <td>{{row.cronExpression}}</td>
+            <td>{{row.eventType}}</td>
             <td>{{row.needFeedback | format:'needFeedbackLabel'}}</td>
             <td>{{row.extParams | format:'stringifyJSON'}}</td>
+            <td>{{row.bizId}}</td>
+            <td>{{row.bizType}}</td>
             <td>
                 <pre>{{row.msg}}</pre>
             </td>
@@ -190,6 +210,8 @@
 
         $(document).on("click", "#searchBtn", function () {
             var realTaskId = $("input[name='realTaskId']").val();
+            var bizId = $("input[name='bizId']").val();
+            var eventType = $("input[name='eventType']").val();
 //            if (!taskId) {
 //                sweetAlert("请输入任务ID", "请输入你提交的任务ID(TaskId)", "error");
 //                return;
@@ -217,6 +239,8 @@
             var params = {
                 realTaskId: realTaskId,
                 taskTrackerNodeGroup: taskTrackerNodeGroup,
+                bizId: bizId,
+                eventType: eventType,
                 startLogTime: startLogTime, endLogTime: endLogTime
             };
             if (!realTaskId) {

@@ -147,6 +147,9 @@ public class RshHolder {
                 jobLogPo.setRepeatCount(rs.getInt("repeat_count"));
                 jobLogPo.setRepeatedCount(rs.getInt("repeated_count"));
                 jobLogPo.setRepeatInterval(rs.getLong("repeat_interval"));
+                jobLogPo.setEventType(rs.getString("eventType"));
+                jobLogPo.setBizId(rs.getString("bizId"));
+                jobLogPo.setBizType(rs.getString("bizType"));
                 result.add(jobLogPo);
             }
             return result;
