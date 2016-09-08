@@ -153,7 +153,7 @@
 
     <profiles>
         <profile>
-            <id>default</id>
+            <id>development</id>
             <dependencies>
                 <dependency>
                     <groupId>com.github.ltsopensource</groupId>
@@ -250,7 +250,21 @@
             </dependencies>
 
             <properties>
+ 				<p.jdbc.maxActive>10</p.jdbc.maxActive>
+                <p.jdbc.initSize>1</p.jdbc.initSize>
+                <p.jdbc.maxIdle>1</p.jdbc.maxIdle>
 
+            	<p.ltsadmin.jdbc.url>
+            		<![CDATA[jdbc:mysql://192.168.0.103:3306/tnt-ltsadmin?useUnicode=true&characterEncoding=UTF-8]]>
+            	</p.ltsadmin.jdbc.url>
+				<p.ltsadmin.jdbc.username>root</p.ltsadmin.jdbc.username>
+				<p.ltsadmin.jdbc.password>123456</p.ltsadmin.jdbc.password>
+            
+            	<p.lts.jobtracker.jdbc.url>
+            		<![CDATA[jdbc:mysql://192.168.0.103:3306/tnt-jobtracker?useUnicode=true&characterEncoding=UTF-8]]>
+            	</p.lts.jobtracker.jdbc.url>
+				<p.lts.jobtracker.jdbc.username>root</p.lts.jobtracker.jdbc.username>
+				<p.lts.jobtracker.jdbc.password>123456</p.lts.jobtracker.jdbc.password>
                 <!-- log4j 配置 -->
                 <p.rootLogger>INFO, A1</p.rootLogger>
                 <p.loger.lever.ibatis>INFO</p.loger.lever.ibatis>
@@ -273,48 +287,37 @@
                 </dependency>
             </dependencies>
         </profile>
-        <!-- jdbc 配置 -->
-        <profile>
-            <id>integration_test</id>
-            <properties>
-                
-                <p.jdbc.maxActive>10</p.jdbc.maxActive>
-                <p.jdbc.initSize>1</p.jdbc.initSize>
-                <p.jdbc.maxIdle>1</p.jdbc.maxIdle>
-
-            	<p.ltsadmin.jdbc.url>
-            		<![CDATA[jdbc:mysql://192.168.0.103:3306/tnt-ltsadmin?useUnicode=true&characterEncoding=UTF-8]]>
-            	</p.ltsadmin.jdbc.url>
-				<p.ltsadmin.jdbc.username>root</p.ltsadmin.jdbc.username>
-				<p.ltsadmin.jdbc.password>123456</p.ltsadmin.jdbc.password>
-            
-            	<p.lts.jobtracker.jdbc.url>
-            		<![CDATA[jdbc:mysql://192.168.0.103:3306/tnt-jobtracker?useUnicode=true&characterEncoding=UTF-8]]>
-            	</p.lts.jobtracker.jdbc.url>
-				<p.lts.jobtracker.jdbc.username>root</p.lts.jobtracker.jdbc.username>
-				<p.lts.jobtracker.jdbc.password>123456</p.lts.jobtracker.jdbc.password>
-                
-            </properties>
-        </profile>
-        
-        <profile>
-            <id>test_dist_207</id>
-            <properties>
-
-                <!-- log4j 配置 -->
-                <p.rootLogger>INFO, A1</p.rootLogger>
-                <p.loger.lever.ibatis>INFO</p.loger.lever.ibatis>
-                <p.loger.lever.sql>DEBUG</p.loger.lever.sql>
-                
-                <!-- lts zk 服务配置 -->
-                <p.zk.cluster.name>tnt_msg_cluster</p.zk.cluster.name> <!-- 服务集群 -->
-                <p.zk.registry.address>zookeeper://10.113.10.207:2181</p.zk.registry.address><!-- 注册地址 -->
-                
-            </properties>
-        </profile>
     </profiles>
 
     <build>
+    	<finalName>lts</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources/conf</directory>
+				<excludes>
+					<exclude>*.properties</exclude>
+					<exclude>*.cfg</exclude>
+				</excludes>
+			</resource>
+
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+			
+			<resource>
+				<directory>src/main/resources/conf</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.cfg</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+
+		</resources>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -326,8 +329,8 @@
                     </descriptors>
                 </configuration>
             </plugin>
-        </plugins>
-    </build>
-    
+            
+		</plugins>
+	</build>
     
 </project>
