@@ -20,7 +20,7 @@ public class SystemInitListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-
+    	
         String confPath = servletContextEvent.getServletContext().getInitParameter("lts.admin.config.path");
         if (StringUtils.isNotEmpty(confPath)) {
             System.out.println("lts.admin.config.path : " + confPath);
@@ -60,6 +60,8 @@ public class SystemInitListener implements ServletContextListener {
             }
             MonitorAgentStartup.start(ltsMonitorCfgPath);
         }
+        
+        LoginConfigurer.load(); //Load Login infos: username/password, By huqingyao 2016/10/26
     }
 
     @Override
