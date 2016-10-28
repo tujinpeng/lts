@@ -10,6 +10,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.github.ltsopensource.admin.support.AppConfigurer;
+
 /**
  * 访问权限(部分URL需授权用户才能访问)控制
  * @author huqingyao
@@ -38,8 +40,10 @@ public class AuthFilter extends AbsFilter implements Filter {
 			return;
 		}
 		
-		//提示用户对当前请求的URL不具有权限
-		showDialog(response, "您不具有该操作的权限！");
+		//提示用户对当前请求的URL不具有操作权限
+		String reqType = request.getHeader("X-Requested-With");
+		boolean isAjax = (null != reqType && reqType.equals("XMLHttpRequest")); //是否为ajax请求
+		showDialog(response, AppConfigurer.getProperty(AUTH_DIALOG_MSG), isAjax);
 	}
 	
 	

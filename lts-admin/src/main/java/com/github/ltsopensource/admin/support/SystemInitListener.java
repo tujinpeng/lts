@@ -26,6 +26,7 @@ public class SystemInitListener implements ServletContextListener {
             System.out.println("lts.admin.config.path : " + confPath);
         }
         AppConfigurer.load(confPath);
+        LoginConfigurer.load(confPath);
 
         String compiler = AppConfigurer.getProperty("configs." + ExtConfig.COMPILER);
         if (StringUtils.isNotEmpty(compiler)) {
@@ -60,8 +61,6 @@ public class SystemInitListener implements ServletContextListener {
             }
             MonitorAgentStartup.start(ltsMonitorCfgPath);
         }
-        
-        LoginConfigurer.load(); //Load Login infos: username/password, By huqingyao 2016/10/26
     }
 
     @Override

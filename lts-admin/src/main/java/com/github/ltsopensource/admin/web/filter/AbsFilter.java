@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import net.sf.json.JSONObject;
+
 import org.springframework.util.AntPathMatcher;
 
 import com.github.ltsopensource.admin.support.LoginConfigurer;
@@ -33,6 +35,11 @@ public abstract class AbsFilter implements Filter {
 	 * WWW-authenticate授权前缀
 	 */
 	protected static final String AUTH_PREFIX = "Basic ";
+	
+	/**
+	 * 无授权弹窗的提示信息的key
+	 */
+	protected static final String AUTH_DIALOG_MSG = "auth.dialog.msg";
 	
 	/**
 	 * 无条件放行的URL
@@ -207,11 +214,19 @@ public abstract class AbsFilter implements Filter {
 	 * 弹窗提示
 	 * @param response
 	 * @param msg 提示信息
+	 * @param isAjax 是否为ajax请求
 	 * @throws IOException
 	 */
-	protected void showDialog(HttpServletResponse response, String msg) throws IOException {
-		response.setContentType("text/html; charset=utf-8");
-		response.getWriter().write("<script>alert('" + msg + "');</script>");
+	protected void showDialog(HttpServletResponse response, String msg, boolean isAjax) throws IOException {
+		JSONObject json = new JSONObject();
+		json.put("errno", 0);
+		json.put("data", "alert('" + msg + "');");
+		
+		String contentType = isAjax ? "text/javascript; charset=utf-8" : "text/html; charset=utf-8";
+		String out = isAjax ? json.toString() : "<script>alert('" + msg + "'); window.history.go(-1);</script>";
+		
+		response.setContentType(contentType);
+		response.getWriter().write(out);
 		response.getWriter().flush();
 	}
 	

@@ -289,6 +289,11 @@
                         dataType: 'json',
                         data: {jobId: jobId, taskTrackerNodeGroup: taskTrackerNodeGroup},
                         success: function (json) {
+                            if(json && json.errno == 0){
+		                		eval(json.data);
+		                		return;
+		                	}
+		                	
                             if (json && json.success) {
                                 swal("删除成功!", "恭喜你", "success");
                                 that.parents("tr").remove();
@@ -392,6 +397,11 @@
                 dataType: 'json',
                 data: params,
                 success: function (json) {
+                	if(json && json.errno == 0){
+                		eval(json.data);
+                		return;
+                	}
+                	
                     if (json && json.success) {
                         swal("修改成功!", "恭喜你", "success");
                         $("#form")[0].reset();
@@ -427,6 +437,11 @@
                         dataType: 'json',
                         data: {jobId: jobId, taskTrackerNodeGroup: taskTrackerNodeGroup},
                         success: function (json) {
+                        	if(json && json.errno == 0){
+		                		eval(json.data);
+		                		return;
+		                	}
+		                	
                             if (json && json.success) {
                                 swal("暂停成功!", "恭喜你", "success");
                                 that.parents("tr").remove();
