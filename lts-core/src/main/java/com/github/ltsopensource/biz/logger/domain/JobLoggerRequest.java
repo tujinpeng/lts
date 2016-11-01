@@ -14,6 +14,7 @@ public class JobLoggerRequest extends PaginationReq {
 
     private String taskTrackerNodeGroup;
     
+    
     private String bizId;
     
     private String eventType;
@@ -22,6 +23,14 @@ public class JobLoggerRequest extends PaginationReq {
 
     private Date endLogTime;
 
+    private String submitNodeGroup;//提交节点组
+    
+    private String objectId; //objectId
+    
+    private LogType logType; // 日志类型
+    
+    private boolean success;//执行结果
+    
     public String getRealTaskId() {
         return realTaskId;
     }
@@ -45,8 +54,8 @@ public class JobLoggerRequest extends PaginationReq {
     public void setTaskTrackerNodeGroup(String taskTrackerNodeGroup) {
         this.taskTrackerNodeGroup = taskTrackerNodeGroup;
     }
-
-    public Date getStartLogTime() {
+    
+	public Date getStartLogTime() {
         return startLogTime;
     }
 
@@ -78,5 +87,37 @@ public class JobLoggerRequest extends PaginationReq {
 		this.eventType = eventType;
 	}
     
+	 public String getSubmitNodeGroup() {
+		return submitNodeGroup;
+	}
+
+	public void setSubmitNodeGroup(String submitNodeGroup) {
+		this.submitNodeGroup = submitNodeGroup;
+	}
+
+	public String getObjectId() {
+		return objectId;
+	}
+
+	public void setObjectId(String objectId) {
+		this.objectId = objectId;
+	}
+
+	public LogType getLogType() {
+		return logType;
+	}
+
+	public void setLogType(LogType logType) {
+		this.logType = logType;
+	}
+
+	public boolean isSuccess() {
+		return success;
+	}
+
+	public void setSuccess(boolean success) {
+		this.success = success;
+	}
+
     
 }

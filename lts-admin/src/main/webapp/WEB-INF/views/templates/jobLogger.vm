@@ -25,7 +25,7 @@
                                        placeholder="请输入你提交的任务ID(TaskId)">
                             </div>
 
-                            <label class="col-sm-1 control-label">节点组</label>
+                            <label class="col-sm-1 control-label">执行节点组</label>
 
                             <div class="col-sm-3">
                                 <select class="form-control selectpicker" name="taskTrackerNodeGroup">
@@ -41,11 +41,37 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">业务ID</label>
+                            <label class="col-sm-2 control-label">提交节点组</label>
+
+                            <div class="col-sm-3">
+                                <select class="form-control selectpicker" name="submitNodeGroup">
+                                    <option value="">-- 不限 --</option>
+                                    #foreach ($nodeGroup in $submitNodeGroups)
+                                        #if ($submitNodeGroup == $nodeGroup.name)
+                                            <option value="$nodeGroup.name" selected>$nodeGroup.name</option>
+                                        #else
+                                            <option value="$nodeGroup.name">$nodeGroup.name</option>
+                                        #end
+                                    #end
+                                </select>
+                            </div>
+
+                            <label class="col-sm-1 control-label">执行结果</label>
+
+                            <div class="col-sm-3">
+                                <select class="form-control selectpicker" name="success">
+                                    <option value="">-- 不限 --</option>
+                                    <option value="1">执行成功</option>
+                                    <option value="0">执行失败</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">objectID</label>
 
                             <div class="col-sm-3">
                                 <input type="text" class="form-control" name="bizId" value="$!bizId"
-                                       placeholder="请输入你提交的业务ID(bizId)">
+                                       placeholder="请输入你提交的objectID(objectId)">
                             </div>
                             <label class="col-sm-1 control-label">eventType</label>
 
@@ -211,12 +237,16 @@
         $(document).on("click", "#searchBtn", function () {
             var realTaskId = $("input[name='realTaskId']").val();
             var bizId = $("input[name='bizId']").val();
+            var objectId = $("input[name='objectId']").val();//objectId 
+            var submitNodeGroup = $("select[name='submitNodeGroup']").val();//提交节点组
+            var logType = $("select[name='logType']").val();//日志类型
+            var success = $("select[name='success']").val();//执行结果
             var eventType = $("input[name='eventType']").val();
 //            if (!taskId) {
 //                sweetAlert("请输入任务ID", "请输入你提交的任务ID(TaskId)", "error");
 //                return;
 //            }
-            var taskTrackerNodeGroup = $("select[name='taskTrackerNodeGroup']").val();
+            var taskTrackerNodeGroup = $("select[name='taskTrackerNodeGroup']").val();//执行节点组
             var startLogTime = $("input[name='startLogTime']").val();
             var endLogTime = $("input[name='endLogTime']").val();
             if (!startLogTime) {

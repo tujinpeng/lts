@@ -76,6 +76,17 @@
                                     重置
                                 </button>
                             </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-warning" type="button" id="batchChangePrior">
+                                    批量操作优先级
+                                </button>
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-warning" type="reset" id="batchTrigger">
+                                    批量触发
+                                </button>
+                            </div>
+                            
                         </div>
                         <div class="hr-line-dashed"></div>
                     </form>
@@ -94,6 +105,24 @@
     </div>
 </div>
 
+<div class="modal inmodal" id="batch-edit-prior" role="dialog" aria-hidden="true" style="display:none;">
+	<div class="modal-dialog" style="width:300px;">
+		<div class="modal-content animated rubberBand">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">关闭</span></button>
+                <h2 class="modal-title">批量编辑优先级</h2>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<form method="post" id="batchEditForm" class="form-horizontal" onsubmit="return false">
+						
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 <div class="modal inmodal" id="job-edit-modal" role="dialog" aria-hidden="true" style="display: none;">
     <div class="modal-dialog" style="width: 600px;">
         <div class="modal-content animated rubberBand">
@@ -192,6 +221,7 @@
     <table class="table table-stripped toggle-arrow-tiny footable" data-page-size="10">
         <thead>
         <tr>
+        	<th><input type="checkbox" name="allClk" value="">全选</th>
             <th data-toggle="true">任务ID</th>
             <th data-hide="all">提交节点组</th>
             <th>类型</th>
@@ -213,6 +243,7 @@
         <tbody>
         {{each rows as row index}}
         <tr>
+        	<td><input type="checkbox" name="executableClk" taskId="{{row.realTaskId}}" /></td>
             <td>{{row.realTaskId}}</td>
             <td>{{row.submitNodeGroup}}</td>
             <td>{{row.jobType | format: 'jobTypeFormat', row}}</td>
@@ -453,5 +484,33 @@
             ltsTable.post(params, 1);
         });
         $("#searchBtn").trigger("click");
+        
+        //设置checkbox全选
+        $("input[type=checkbox][name=allClk]").click(function(){
+        	if(this.checked){
+        		$("input[type=checkbox][name=executableClk]").attr("checked", true);
+        	}else{
+        		$("input[type=checkbox][name=executableClk]").attr("checked", false);
+        	}
+        });
+        //单个checkbox
+        $("input[type=checkbox][name=executableClk]").click(function(){
+        	var allLength = $("input[type=checkbox][name=executableClk]").length;//总数
+        	var checkedLength = $("input[type=checkbox][name=executableClk]:checked").length;//选中的个数
+        	if(allLength == checkedLength){
+        		$("input[name=allClk]").attr("checked", true);
+        	}else{
+        		$("input[name=allClk]").attr("checked", false);
+        	}
+        
+        });
+        //批量操作优先级
+        $(document).on("click", "#batchChangePrior", function(){
+        	var batchClk = $("input[name=executableClk]:checked").length;
+        	if(batchClk <= 0){
+        		sweetAlert("请选择", "需要操作优先级的任务", "error");
+        		return;
+        	}
+        });
     });
 </script>

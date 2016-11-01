@@ -154,6 +154,10 @@ public class MysqlJobLogger extends JdbcAbstractAccess implements JobLogger {
                 .andOnNotEmpty("task_id = ?", request.getTaskId())
                 .andOnNotEmpty("real_task_id = ?", request.getRealTaskId())
                 .andOnNotEmpty("task_tracker_node_group = ?", request.getTaskTrackerNodeGroup())
+                .andOnNotEmpty("submit_node_group = ?", request.getSubmitNodeGroup())//提交节点组
+                .andOnNotEmpty("success = ?", request.isSuccess() ? "1" : "0")//执行结果
+                .andOnNotEmpty("log_type = ?", request.getLogType().name())//日志类型
+                .andOnNotEmpty("object_id = ?", request.getObjectId())//objectId
                 .andOnNotEmpty("bizId = ?", request.getBizId())
                 .andOnNotEmpty("eventType = ?", request.getEventType())
                 .andBetween("log_time", JdbcTypeUtils.toTimestamp(request.getStartLogTime()), JdbcTypeUtils.toTimestamp(request.getEndLogTime()))
