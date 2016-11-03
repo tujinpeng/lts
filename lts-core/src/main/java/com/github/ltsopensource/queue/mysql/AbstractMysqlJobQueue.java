@@ -1,20 +1,27 @@
 package com.github.ltsopensource.queue.mysql;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
 import com.github.ltsopensource.admin.request.JobQueueReq;
 import com.github.ltsopensource.admin.response.PaginationRsp;
 import com.github.ltsopensource.core.cluster.Config;
 import com.github.ltsopensource.core.commons.utils.Assert;
 import com.github.ltsopensource.core.commons.utils.CharacterUtils;
+import com.github.ltsopensource.core.commons.utils.StringUtils;
 import com.github.ltsopensource.core.json.JSON;
 import com.github.ltsopensource.core.support.SystemClock;
 import com.github.ltsopensource.queue.JobQueue;
 import com.github.ltsopensource.queue.domain.JobPo;
 import com.github.ltsopensource.queue.mysql.support.RshHolder;
 import com.github.ltsopensource.store.jdbc.JdbcAbstractAccess;
-import com.github.ltsopensource.store.jdbc.builder.*;
+import com.github.ltsopensource.store.jdbc.builder.InsertSql;
+import com.github.ltsopensource.store.jdbc.builder.OrderByType;
+import com.github.ltsopensource.store.jdbc.builder.SelectSql;
+import com.github.ltsopensource.store.jdbc.builder.UpdateSql;
+import com.github.ltsopensource.store.jdbc.builder.WhereSql;
 import com.github.ltsopensource.store.jdbc.dbutils.JdbcTypeUtils;
-
-import java.util.List;
 
 /**
  * @author Robert HG (254963746@qq.com) on 5/31/15.
@@ -116,6 +123,19 @@ public abstract class AbstractMysqlJobQueue extends JdbcAbstractAccess implement
 
         return sql.where("job_id=?", request.getJobId())
                 .doUpdate() == 1;
+    }
+    
+    public boolean batchUpdateByJobIds(String[] jobIds, JobQueueReq request) {
+    	Assert.notEmpty(jobIds, "jobIds can not be null!");
+    	Assert.notNull(request.getPriority(), "priority can not be null!");
+    	Assert.notNull(request.getTaskTrackerNodeGroup(), "taskTracketNodeGroup can not be null!");
+        UpdateSql sql = buildUpdateSqlPrefix(request);
+        String [] cause = new String[jobIds.length];
+        Arrays.fill(cause, "?");
+        return sql.where("job_id in (" + StringUtils.join(cause, ",") + ")", jobIds)
+        		.and("task_tracker_node_group = ?", request.getTaskTrackerNodeGroup())
+                .doUpdate() >0;
+        
     }
 
     @Override

@@ -6,6 +6,9 @@ import com.github.ltsopensource.core.logger.support.MessageFormatter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -202,4 +205,32 @@ public final class StringUtils {
         sb.append(str.substring(1));
         return sb.toString();
     }
+    
+    public static String join(Object[] array, String separator) {
+    	return join(array, separator, 0, array.length);
+    }
+    
+    public static String join(Object[] array, String separator, int startIndex, int endIndex) {
+    	if (array == null) {
+          return null;
+        }
+         int bufSize = endIndex - startIndex;
+         if (bufSize <= 0) {
+           return "";
+         }
+         
+         bufSize *= ((array[startIndex] == null ? 16 : array[startIndex].toString().length()) + 1);
+         StringBuffer buf = new StringBuffer(bufSize);
+         
+         for (int i = startIndex; i < endIndex; i++) {
+           if (i > startIndex) {
+             buf.append(separator);
+           }
+           if (array[i] != null) {
+             buf.append(array[i]);
+           }
+         }
+         return buf.toString();
+    }
+    
 }

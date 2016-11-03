@@ -14,5 +14,7 @@ public interface JobQueue {
     boolean selectiveUpdateByJobId(JobQueueReq request);
 
     boolean selectiveUpdateByTaskId(JobQueueReq request);
+    
+    boolean batchUpdateByJobIds(String[] jobIds, JobQueueReq request);//批量更新
 
 }
