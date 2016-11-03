@@ -1,6 +1,5 @@
 package com.github.ltsopensource.queue.mongo;
 
-import com.github.ltsopensource.admin.request.JobQueueReq;
 import com.github.ltsopensource.core.cluster.Config;
 import com.github.ltsopensource.core.commons.utils.CollectionUtils;
 import com.github.ltsopensource.core.support.JobQueueUtils;
@@ -98,10 +97,5 @@ public class MongoRepeatJobQueue extends MongoSchedulerJobQueue implements Repea
             }
         }
     }
-
-	@Override
-	public boolean batchUpdateByJobIds(String[] jobIds, JobQueueReq request) {
-		return false;
-	}
 
 }
