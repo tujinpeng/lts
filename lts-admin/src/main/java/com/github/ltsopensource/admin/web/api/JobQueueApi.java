@@ -1,5 +1,20 @@
 package com.github.ltsopensource.admin.web.api;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.ltsopensource.admin.cluster.BackendAppContext;
 import com.github.ltsopensource.admin.request.JobQueueReq;
 import com.github.ltsopensource.admin.response.PaginationRsp;
@@ -25,15 +40,6 @@ import com.github.ltsopensource.core.domain.Pair;
 import com.github.ltsopensource.core.json.JSON;
 import com.github.ltsopensource.core.support.CronExpression;
 import com.github.ltsopensource.queue.domain.JobPo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Robert HG (254963746@qq.com) on 6/6/15.
@@ -113,6 +119,43 @@ public class JobQueueApi extends AbstractMVC {
             return Builder.build(false, "TriggerFailed failed");
         }
     }
+    
+    @RequestMapping("/job-queue/executable-job-batchTrigger")
+    public RestfulResponse batchTriggerJobManually(String executableTriggers) {
+    	try {
+    		Assert.hasLength(executableTriggers, "需要触发的jobIds不能为空!");
+    	} catch(IllegalArgumentException e) {
+    		return Builder.build(false, e.getMessage());
+    	}
+    	JSONArray array = JSONArray.parseArray(executableTriggers);
+    	HttpCmdResponse response = null;
+    	for(int i = 0; i < array.size(); i++) {
+    		JSONObject obj = (JSONObject)array.get(i);
+    		HttpCmd httpCmd = new DefaultHttpCmd();
+            httpCmd.setCommand(HttpCmdNames.HTTP_CMD_TRIGGER_JOB_MANUALLY);
+            httpCmd.addParam("jobId", obj.getString("jobId"));
+            httpCmd.addParam("nodeGroup", obj.getString("taskTrackerNodeGroup"));
+
+            List<Node> jobTrackerNodeList = appContext.getNodeMemCacheAccess().getNodeByNodeType(NodeType.JOB_TRACKER);
+            if (CollectionUtils.isEmpty(jobTrackerNodeList)) {
+                return Builder.build(false, I18nManager.getMessage("job.tracker.not.found"));
+            }
+
+            for (Node node : jobTrackerNodeList) {
+                httpCmd.setNodeIdentity(node.getIdentity());
+                response = HttpCmdClient.doGet(node.getIp(), node.getHttpCmdPort(), httpCmd);
+                if (response.isSuccess()) {
+                    return Builder.build(true);
+                }
+            }
+    	}
+    	if (response != null) {
+    		return Builder.build(false, response.getMsg());
+    	} else {
+    		return Builder.build(false, "TriggerFailed failed");
+    	}
+    }
+
 
     @RequestMapping("/job-queue/executing-job-get")
     public RestfulResponse executingJobGet(JobQueueReq request) {
@@ -123,8 +166,57 @@ public class JobQueueApi extends AbstractMVC {
         response.setRows(paginationRsp.getRows());
         return response;
     }
+    
+    @RequestMapping("/job-queue/executable-job-batchUpdate")
+    public RestfulResponse executableJobBatchUpdate(String executablePriors, String priority) {
+    	RestfulResponse response = new RestfulResponse();
+    	boolean success = false;
+    	try {
+    		Assert.hasLength(executablePriors, "需要修改优先级的jobIds不能为空!");
+    		Assert.hasLength(priority, "priority cannot be null!");
+    		JSONArray array = JSONArray.parseArray(executablePriors);
+    		Map<String, List<String>> map = getTaskTrackerNodeGroups(array);
+    		Iterator<Entry<String, List<String>>> it = map.entrySet().iterator();
+    		while(it.hasNext()) {
+    			Entry<String, List<String>> entry = it.next();
+    			String taskTrackerNodeGroup = entry.getKey();
+    			List<String> list = entry.getValue();
+    			String[] jobIds = (String[])list.toArray(new String[list.size()]);
+    			JobQueueReq request = new JobQueueReq();
+    			request.setTaskTrackerNodeGroup(taskTrackerNodeGroup);
+    			request.setPriority(Integer.valueOf(priority));
+    			success = appContext.getExecutableJobQueue().batchUpdateByJobIds(jobIds, request);
+    		}
+    		if (success) {
+                response.setSuccess(true);
+            } else {
+                response.setSuccess(false);
+                response.setCode("DELETE_OR_RUNNING");
+            }
+    	} catch (IllegalArgumentException e) {
+            return Builder.build(false, e.getMessage());
+        }
+    	
+    	return response;
+    }
 
-    @RequestMapping("/job-queue/executable-job-update")
+    private Map<String, List<String>> getTaskTrackerNodeGroups(JSONArray array) {
+    	Map<String, List<String>> map = new HashMap<String, List<String>>();
+    	for(int i = 0; i < array.size(); i++) {
+    		JSONObject obj = (JSONObject)array.get(i);
+    		
+    		if(map.containsKey(obj.getString("taskTrackerNodeGroup"))) {
+    			map.get(obj.getString("taskTrackerNodeGroup")).add(obj.getString("jobId"));
+    			continue;
+    		}
+    		List<String> list = new ArrayList<String>();
+    		list.add(obj.getString("jobId"));
+    		map.put(obj.getString("taskTrackerNodeGroup"), list);
+    	}
+		return map;
+	}
+
+	@RequestMapping("/job-queue/executable-job-update")
     public RestfulResponse executableJobUpdate(JobQueueReq request) {
         // 检查参数
         // 1. 检测 cronExpression是否是正确的
@@ -154,7 +246,7 @@ public class JobQueueApi extends AbstractMVC {
         }
         return response;
     }
-
+	
     @RequestMapping("/job-queue/executable-job-delete")
     public RestfulResponse executableJobDelete(JobQueueReq request) {
         try {

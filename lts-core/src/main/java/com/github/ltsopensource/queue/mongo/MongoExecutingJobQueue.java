@@ -1,5 +1,6 @@
 package com.github.ltsopensource.queue.mongo;
 
+import com.github.ltsopensource.admin.request.JobQueueReq;
 import com.github.ltsopensource.core.cluster.Config;
 import com.github.ltsopensource.core.commons.utils.CollectionUtils;
 import com.github.ltsopensource.core.support.JobQueueUtils;
@@ -90,5 +91,11 @@ public class MongoExecutingJobQueue extends AbstractMongoJobQueue implements Exe
         query.field("jobId").equal(jobId);
         return query.get();
     }
+
+	@Override
+	public boolean batchUpdateByJobIds(String[] jobIds, JobQueueReq request) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

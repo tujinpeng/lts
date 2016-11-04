@@ -8,6 +8,7 @@ import com.github.ltsopensource.store.jdbc.SqlTemplate;
 import com.github.ltsopensource.store.jdbc.exception.JdbcException;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class UpdateSql {
     private SqlTemplate sqlTemplate;
     private StringBuilder sql = new StringBuilder();
     private List<Object> params = new LinkedList<Object>();
+    private boolean isFirstCondition = true;
 
     public UpdateSql(SqlTemplate sqlTemplate) {
         this.sqlTemplate = sqlTemplate;
@@ -80,6 +82,29 @@ public class UpdateSql {
     public UpdateSql or(String condition, Object value) {
         sql.append(" OR ").append(condition);
         params.add(value);
+        return this;
+    }
+    
+    public UpdateSql in(String condition, Object [] values) {
+		if (!isFirstCondition) {
+            sql.append(" AND ");
+        }
+        isFirstCondition = false;
+	
+		StringBuilder inSql = new StringBuilder();
+		inSql.append(condition);
+		inSql.append(" IN ");
+		inSql.append("(");
+		
+		String [] cause = new String[values.length];
+        Arrays.fill(cause, "?");
+		inSql.append(StringUtils.join(cause, ","));
+		inSql.append(") ");
+		
+		sql.append(inSql);
+		for(Object t : values ) {
+			params.add(t);
+		}
         return this;
     }
 
