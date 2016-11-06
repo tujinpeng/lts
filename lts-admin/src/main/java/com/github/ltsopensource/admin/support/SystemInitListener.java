@@ -20,12 +20,13 @@ public class SystemInitListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-
+    	
         String confPath = servletContextEvent.getServletContext().getInitParameter("lts.admin.config.path");
         if (StringUtils.isNotEmpty(confPath)) {
             System.out.println("lts.admin.config.path : " + confPath);
         }
         AppConfigurer.load(confPath);
+        LoginConfigurer.load(confPath);
 
         String compiler = AppConfigurer.getProperty("configs." + ExtConfig.COMPILER);
         if (StringUtils.isNotEmpty(compiler)) {

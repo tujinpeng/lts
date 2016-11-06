@@ -271,6 +271,11 @@
                 dataType: 'json',
                 data: params,
                 success: function (json) {
+                	if(json && json.errno == 0){
+                		eval(json.data);
+                		return;
+                	}
+                	
                     if (json && json.success) {
                         swal("触发成功!", "等待TaskTracker接收执行", "success");
                     } else {
@@ -308,6 +313,11 @@
                             cronExpression: cronExpression
                         },
                         success: function (json) {
+                        	if(json && json.errno == 0){
+		                		eval(json.data);
+		                		return;
+		                	}
+		                	
                             if (json && json.success) {
                                 swal("删除成功!", "恭喜你", "success");
                                 that.parents("tr").remove();
@@ -411,6 +421,11 @@
                 dataType: 'json',
                 data: params,
                 success: function (json) {
+                	if(json && json.errno == 0){
+                		eval(json.data);
+                		return;
+                	}
+                	
                     if (json && json.success) {
                         swal("修改成功!", "恭喜你", "success");
                         $("#form")[0].reset();

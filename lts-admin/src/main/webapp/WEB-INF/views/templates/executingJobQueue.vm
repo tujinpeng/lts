@@ -187,6 +187,11 @@
                         dataType: 'json',
                         data: {jobId: jobId},
                         success: function (json) {
+                        	if(json && json.errno == 0){
+		                		eval(json.data);
+		                		return;
+		                	}
+		                	
                             if (json && json.success) {
                                 swal("终止命令发送成功!", "可以重新查询观察结果", "success");
                             } else {
