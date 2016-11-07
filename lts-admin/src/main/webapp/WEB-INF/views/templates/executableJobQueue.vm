@@ -81,9 +81,8 @@
                                     批量操作优先级
                                 </button>
                             </div>
-                            <div class="col-sm-1"></div>
                             <div class="col-sm-1">
-                                <button class="btn btn-warning" type="reset" id="batchTrigger">
+                                <button class="btn btn-warning" type="reset" id="batchTrigger" style="margin-left:20px;">
                                     批量触发
                                 </button>
                             </div>
@@ -246,7 +245,7 @@
         <thead>
         <tr>
         	<th style="visibility:hidden;"></th>
-            <th data-toggle="true">任务ID</th>
+            <th style="padding:8px 8px 8px 21px;" data-toggle="true">任务ID</th>
             <th data-hide="all">提交节点组</th>
             <th>类型</th>
             <th>执行节点组</th>
@@ -268,7 +267,7 @@
         {{each rows as row index}}
         <tr>
         	<td><input type="checkbox" name="executableClk" jobId="{{row.jobId}}" taskTrackerNodeGroup="{{row.taskTrackerNodeGroup}}" id="executableClk"/></td>
-            <td>{{row.realTaskId}}</td>
+            <td style="padding:8px 8px 8px 21px;">{{row.realTaskId}}</td>
             <td>{{row.submitNodeGroup}}</td>
             <td>{{row.jobType | format: 'jobTypeFormat', row}}</td>
             <td>{{row.taskTrackerNodeGroup}}</td>

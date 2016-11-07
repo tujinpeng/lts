@@ -25,11 +25,11 @@ public class JobLoggerRequest extends PaginationReq {
 
     private String submitNodeGroup;//提交节点组
     
-    private String objectId; //objectId
+    private String logType; // 日志类型
     
-    private LogType logType; // 日志类型
+    private String jobType;//类型
     
-    private boolean success;//执行结果
+    private String success;//执行结果
     
     public String getRealTaskId() {
         return realTaskId;
@@ -95,27 +95,27 @@ public class JobLoggerRequest extends PaginationReq {
 		this.submitNodeGroup = submitNodeGroup;
 	}
 
-	public String getObjectId() {
-		return objectId;
-	}
-
-	public void setObjectId(String objectId) {
-		this.objectId = objectId;
-	}
-
-	public LogType getLogType() {
+	public String getLogType() {
 		return logType;
 	}
 
-	public void setLogType(LogType logType) {
+	public void setLogType(String logType) {
 		this.logType = logType;
 	}
 
-	public boolean isSuccess() {
+	public String getJobType() {
+		return jobType;
+	}
+
+	public void setJobType(String jobType) {
+		this.jobType = jobType;
+	}
+
+	public String getSuccess() {
 		return success;
 	}
 
-	public void setSuccess(boolean success) {
+	public void setSuccess(String success) {
 		this.success = success;
 	}
 

@@ -46,7 +46,7 @@
                             <div class="col-sm-3">
                                 <select class="form-control selectpicker" name="submitNodeGroup">
                                     <option value="">-- 不限 --</option>
-                                    #foreach ($nodeGroup in $submitNodeGroups)
+                                    #foreach ($nodeGroup in $jobClientNodeGroups)
                                         #if ($submitNodeGroup == $nodeGroup.name)
                                             <option value="$nodeGroup.name" selected>$nodeGroup.name</option>
                                         #else
@@ -78,6 +78,25 @@
                             <div class="col-sm-3">
                                 <input type="text" class="form-control" name="eventType" value="$!eventType"
                                        placeholder="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">类型</label>
+
+                            <div class="col-sm-3">
+                               <select class="form-control selectpicker" name="jobType">
+                               		<option value="">-- 不限 --</option>
+                               		<option value='CRON'>Cron任务</option>
+                               		<option value='REPEAT'>Repeat任务</option>
+                               		<option value='REAL_TIME'>实时任务</option>
+                               		<option value='TRIGGER_TIME'>定时任务</option>
+                               </select>
+                            </div>
+                            <label class="col-sm-1 control-label">日志类型</label>
+
+                            <div class="col-sm-3">
+                                <select class="form-control selectpicker" name="logType">
+                                </select>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -221,6 +240,12 @@
             SUSPEND:'暂停任务',
             RESUME:'恢复任务'
         };
+        
+        var nodes = "<option value=''>--不限--</option>";
+        for(var k in LOG_TYPE){
+			nodes += "<option value='" + k + "'>" + LOG_TYPE[k] + "</option>";  
+        }
+        $("select[name='logType']").append(nodes);
 
         LTS.colFormatter.logTypeLabel = function (v) {
             return v ? LOG_TYPE[v] : v;
@@ -228,18 +253,19 @@
         LTS.colFormatter.successLabel = function (v) {
             return v ? "成功" : "失败";
         }
-
-        var ltsTable = $("#ltstableContainer").ltsTable({
+        
+		var ltsTable = $("#ltstableContainer").ltsTable({
             url: 'api/job-logger/job-logger-get',
             templateId: 'ltstable'
         });
 
+      
+
         $(document).on("click", "#searchBtn", function () {
             var realTaskId = $("input[name='realTaskId']").val();
             var bizId = $("input[name='bizId']").val();
-            var objectId = $("input[name='objectId']").val();//objectId 
-            var submitNodeGroup = $("select[name='submitNodeGroup']").val();//提交节点组
             var logType = $("select[name='logType']").val();//日志类型
+            var jobType = $("select[name='jobType']").val();//类型
             var success = $("select[name='success']").val();//执行结果
             var eventType = $("input[name='eventType']").val();
 //            if (!taskId) {
@@ -247,6 +273,7 @@
 //                return;
 //            }
             var taskTrackerNodeGroup = $("select[name='taskTrackerNodeGroup']").val();//执行节点组
+            var submitNodeGroup = $("select[name='submitNodeGroup']").val();//提交节点组
             var startLogTime = $("input[name='startLogTime']").val();
             var endLogTime = $("input[name='endLogTime']").val();
             if (!startLogTime) {
@@ -269,10 +296,15 @@
             var params = {
                 realTaskId: realTaskId,
                 taskTrackerNodeGroup: taskTrackerNodeGroup,
+                submitNodeGroup : submitNodeGroup,
+                success : success,
                 bizId: bizId,
                 eventType: eventType,
+                jobType : jobType,
+                logType : logType,
                 startLogTime: startLogTime, endLogTime: endLogTime
             };
+            console.log(params)
             if (!realTaskId) {
                 // 如果没有按ID查询，那么要对时间跨度长的做提醒(超过1小时的)
                 if ((DateUtil.parse(endLogTime).getTime() - DateUtil.parse(startLogTime).getTime()) > 60 * 60 * 1000) {
