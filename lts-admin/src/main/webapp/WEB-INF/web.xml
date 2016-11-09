@@ -44,25 +44,27 @@
 			<!-- 需要授权的URL -->
 			<param-name>needAuthenticateUrls</param-name>
 			<param-value>
-				api/job-queue/cron-job-update,			<!-- 任务队列管理/Cron任务之'编辑' -->
-				api/job-queue/cron-job-delete,			<!-- 任务队列管理/Cron任务之'删除' -->
-				api/job-queue/cron-job-suspend,			<!-- 任务队列管理/Cron任务之'暂停' -->
+				api/job-queue/cron-job-update,				<!-- 任务队列管理/Cron任务之'编辑' -->
+				api/job-queue/cron-job-delete,				<!-- 任务队列管理/Cron任务之'删除' -->
+				api/job-queue/cron-job-suspend,				<!-- 任务队列管理/Cron任务之'暂停' -->
 				
-				api/job-queue/repeat-job-update,		<!-- 任务队列管理/Repeat任务之'编辑' -->
-				api/job-queue/repeat-job-delete,		<!-- 任务队列管理/Repeat任务之'删除' -->
-				api/job-queue/repeat-job-suspend,		<!-- 任务队列管理/Repeat任务之'暂停' -->
+				api/job-queue/repeat-job-update,			<!-- 任务队列管理/Repeat任务之'编辑' -->
+				api/job-queue/repeat-job-delete,			<!-- 任务队列管理/Repeat任务之'删除' -->
+				api/job-queue/repeat-job-suspend,			<!-- 任务队列管理/Repeat任务之'暂停' -->
 				
-				api/job-queue/suspend-job-update,		<!-- 任务队列管理/暂停任务之'编辑' -->
-				api/job-queue/suspend-job-delete,		<!-- 任务队列管理/暂停任务之'删除' -->
-				api/job-queue/suspend-job-suspend,		<!-- 任务队列管理/暂停任务之'暂停' -->
+				api/job-queue/suspend-job-update,			<!-- 任务队列管理/暂停任务之'编辑' -->
+				api/job-queue/suspend-job-delete,			<!-- 任务队列管理/暂停任务之'删除' -->
+				api/job-queue/suspend-job-suspend,			<!-- 任务队列管理/暂停任务之'暂停' -->
 				
-				api/job-queue/executing-job-terminate,	<!-- 任务队列管理/执行中的任务之'强制终止' -->
+				api/job-queue/executing-job-terminate,		<!-- 任务队列管理/执行中的任务之'强制终止' -->
 				
-				api/job-queue/executing-job-trigger,	<!-- 任务队列管理/等待执行的任务之'触发' -->
-				api/job-queue/executable-job-update,	<!-- 任务队列管理/等待执行的任务之'编辑' -->
-				api/job-queue/executable-job-delete,	<!-- 任务队列管理/等待执行的任务之'删除' -->
+				api/job-queue/executing-job-trigger,		<!-- 任务队列管理/等待执行的任务之'触发' -->
+				api/job-queue/executable-job-update,		<!-- 任务队列管理/等待执行的任务之'编辑' -->
+				api/job-queue/executable-job-delete,		<!-- 任务队列管理/等待执行的任务之'删除' -->
+				api/job-queue/executable-job-batchUpdate,	<!-- 任务队列管理/等待执行的任务之'批量操作优先级' -->
+				api/job-queue/executable-job-batchTrigger,	<!-- 任务队列管理/等待执行的任务之'批量触发' -->
 				
-				/lts-admin/load-job.htm					<!-- 任务队列管理/手动加载任务 -->
+				/lts-admin/load-job.htm						<!-- 任务队列管理/手动加载任务 -->
 			</param-value>
 		</init-param>
 	</filter>
