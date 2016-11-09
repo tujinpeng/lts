@@ -3,7 +3,8 @@ package com.github.ltsopensource.admin.support;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,9 +28,9 @@ public class LoginConfigurer {
 	
 	/**
 	 * 存储配置文件内容集合</br>
-	 * key/val : 用户名/密码
+	 * 用户名
 	 */
-	private static final Map<String, String> LTS_USERNAME_PASSWORD = new HashMap<String, String>();
+	private static final List<String> LTS_USERNAME = new ArrayList<String>();
 	
 	/**
 	 * 系统初始化-读取配置文件
@@ -55,7 +56,7 @@ public class LoginConfigurer {
 	    				continue;
 	    			}
 	    			
-	    			LTS_USERNAME_PASSWORD.put(entry.getKey().toString(), entry.getValue().toString());
+					LTS_USERNAME.add(entry.getKey().toString());
 				}
 			}
 		} catch (Exception e) {
@@ -64,14 +65,13 @@ public class LoginConfigurer {
 	}
 	
 	/**
-	 * 根据用户名获取对应的密码值
-	 * @param name 用户名
-	 * @return 密码值
+	 * 是否包含目标用户名
+	 * @param name 目标用户名
+	 * @return true/false
 	 */
-	public static String getProperty(String name) {
-		return LTS_USERNAME_PASSWORD.get(name);
+	public static boolean containsUserName(String name) {
+		return LTS_USERNAME.contains(name);
 	}
-	
 	
 	
 }
