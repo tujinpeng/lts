@@ -9,19 +9,16 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONObject;
 
 import org.springframework.util.AntPathMatcher;
 
 import com.github.ltsopensource.admin.support.LoginConfigurer;
-import com.github.ltsopensource.core.commons.utils.Base64;
 import com.github.ltsopensource.core.commons.utils.StringUtils;
+import com.lvmama.comm.pet.po.perm.PermUser;
 import com.lvmama.comm.utils.ServletUtil;
-import com.lvmama.tnt.comm.util.web.HttpServletLocalThread;
-import com.lvmama.tnt.comm.vo.TntConstant;
-import com.lvmama.tnt.user.po.TntUser;
+import com.lvmama.comm.vo.Constant;
 
 /**
  * 抽象过滤器</br>
@@ -31,11 +28,6 @@ import com.lvmama.tnt.user.po.TntUser;
  * @create 2016/10/25
  */
 public abstract class AbsFilter implements Filter {
-	/**
-	 * WWW-authenticate授权前缀
-	 */
-	protected static final String AUTH_PREFIX = "Basic ";
-	
 	/**
 	 * 无授权弹窗的提示信息的key
 	 */
@@ -57,6 +49,11 @@ public abstract class AbsFilter implements Filter {
 	protected static final AntPathMatcher pathMatcher = new AntPathMatcher();
 	
 	/**
+	 * 重定向的URl
+	 */
+	protected static final String REDIRECT_URL = "/pet_back/login.do";
+	
+	/**
 	 * 过滤器初始化
 	 * @param conf
 	 * @throws ServletException
@@ -73,24 +70,12 @@ public abstract class AbsFilter implements Filter {
 	
 	/**
 	 * 获取已登录用户
-	 * @param session
+	 * @param request
+	 * @param response
 	 * @return
 	 */
-	protected TntUser getLoginUser(HttpSession session) {
-		return TntUser.getTntUserByJson((String)getSession(TntConstant.SESSION_TNT_USER));
-	}
-	
-	/**
-	 * 根据key从session中查询对应的value
-	 * @param key
-	 * @return value
-	 */
-	protected Object getSession(String key) {
-		if(null == key || "".equals(key.trim())){
-			return null;
-		}
-		
-		return ServletUtil.getSession(HttpServletLocalThread.getRequest(), HttpServletLocalThread.getResponse(), key);
+	protected PermUser getPermUser(HttpServletRequest request, HttpServletResponse response) {
+		return (PermUser)ServletUtil.getSession(request, response, Constant.SESSION_BACK_USER);
 	}
 	
 	/**
@@ -160,23 +145,18 @@ public abstract class AbsFilter implements Filter {
 	}
 	
 	/**
-	 * 验证是否为配置文件中用户已登录
+	 * 验证是否为配置文件中的授权用户
 	 * @param request
-	 * @return true/false
+	 * @param response
+	 * @return
 	 */
-	protected boolean validateCfg(HttpServletRequest request) {
-		String auth = request.getHeader("authorization");
-		if(null == auth || auth.length() < AUTH_PREFIX.length() || !auth.startsWith(AUTH_PREFIX)){
+	protected boolean validateCfg(HttpServletRequest request, HttpServletResponse response) {
+		PermUser user = this.getPermUser(request, response);
+		if(null == user || StringUtils.isEmpty(user.getUserName())){
 			return false;
 		}
 		
-		//解码，明码格式为：用户名:密码
-		String up = new String(Base64.decodeFast(auth.substring(AUTH_PREFIX.length(), auth.length())));
-		if(!up.contains(":")){
-			return false;
-		}
-		
-		return up.split(":")[1].equals(LoginConfigurer.getProperty(up.split(":")[0]));
+		return LoginConfigurer.containsUserName(user.getUserName());
 	}
 	
 	/**
@@ -184,31 +164,9 @@ public abstract class AbsFilter implements Filter {
 	 * @param request
 	 * @return true/false
 	 */
-	protected boolean validateSuper(HttpServletRequest request) {
-		return null != this.getLoginUser(request.getSession());
+	protected boolean validateSuper(HttpServletRequest request, HttpServletResponse response) {
+		return null != this.getPermUser(request, response);
 	}
-	
-	/**
-	 * 验证通过，授权成功
-	 * @param response
-	 */
-	protected void authenticateSuccess(HttpServletResponse response) {
-        response.setStatus(200);
-        response.setHeader("Pragma", "No-cache");
-        response.setHeader("Cache-Control", "no-store");
-        response.setDateHeader("Expires", 0);
-    }
-	
-	/**
-	 * 验证失败，需重新验证
-	 * @param response
-	 */
-	protected void needAuthenticate(HttpServletResponse response) {
-        response.setStatus(401);
-        response.setHeader("Cache-Control", "no-store");
-        response.setDateHeader("Expires", 0);
-        response.setHeader("WWW-authenticate", AUTH_PREFIX + "Realm=\"lts user need auth\"");
-    }
 	
 	/**
 	 * 弹窗提示

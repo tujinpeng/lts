@@ -34,8 +34,8 @@ public class AuthFilter extends AbsFilter implements Filter {
 		
 		String url = request.getRequestURI();
 		
-		//是否为无条件放行的URL OR 是否为不需要授权的URL OR 是否为已授权用户登录
-		if(isExcludedUrl(url) || !isNeedAuthenticateUrl(url) || validateCfg(request)){
+		//是否为无条件放行的URL OR 是否为不需要授权的URL OR 是否为配置文件中的授权用户
+		if(isExcludedUrl(url) || !isNeedAuthenticateUrl(url) || validateCfg(request, response)){
 			chain.doFilter(request, response);
 			return;
 		}

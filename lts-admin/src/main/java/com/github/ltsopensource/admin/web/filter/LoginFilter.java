@@ -40,13 +40,12 @@ public class LoginFilter extends AbsFilter implements Filter {
 		}
 		
 		//验证是否已登录
-		if(validateCfg(request) || validateSuper(request)){
-			authenticateSuccess(response);
+		if(validateSuper(request, response)){
 			chain.doFilter(request, response);
 			return;
 		}
 		
-		needAuthenticate(response);
+		response.sendRedirect(REDIRECT_URL);
 	}
 	
 	
