@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
 
-import org.springframework.util.AntPathMatcher;
-
 import com.github.ltsopensource.admin.support.LoginConfigurer;
 import com.github.ltsopensource.core.commons.utils.StringUtils;
 import com.lvmama.comm.pet.po.perm.PermUser;
@@ -42,11 +40,6 @@ public abstract class AbsFilter implements Filter {
 	 * 需要授权的URL
 	 */
 	protected static List<String> NEED_AUTHENTICATE_URLS = new ArrayList<String>();
-	
-	/**
-	 * 路径匹配工具类
-	 */
-	protected static final AntPathMatcher pathMatcher = new AntPathMatcher();
 	
 	/**
 	 * 重定向的URl
@@ -112,17 +105,7 @@ public abstract class AbsFilter implements Filter {
 	 * @return
 	 */
 	protected boolean isExcludedUrl(String url) {
-		if(StringUtils.isEmpty(url)){
-			return false;
-		}
-		
-		for(String eUrl : EXCLUDED_URL){
-			if(pathMatcher.match(eUrl, url)){
-				return true;
-			}
-		}
-		
-		return false;
+		return StringUtils.isNotEmpty(url) && EXCLUDED_URL.contains(url);
 	}
 	
 	/**
@@ -131,17 +114,7 @@ public abstract class AbsFilter implements Filter {
 	 * @return
 	 */
 	protected boolean isNeedAuthenticateUrl(String url) {
-		if(StringUtils.isEmpty(url)){
-			return false;
-		}
-		
-		for(String nUrl : NEED_AUTHENTICATE_URLS){
-			if(pathMatcher.match(nUrl, url)){
-				return true;
-			}
-		}
-		
-		return false;
+		return StringUtils.isNotEmpty(url) && NEED_AUTHENTICATE_URLS.contains(url);
 	}
 	
 	/**
