@@ -47,6 +47,7 @@ public interface ExtConfig {
     String ZK_CLIENT_KEY = "zk.client";
     /**
      * JobTracker端: 任务biz logger 可选值 console, mysql, mongo 默认 mysql
+     * @author haofeifei 增加es数据源,lts_job_log_po 迁入es
      */
     String JOB_LOGGER = "job.logger";
     /**
