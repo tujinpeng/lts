@@ -39,7 +39,7 @@ public class EsJobLogger implements JobLogger {
 
     public static String doPost(String method,String log){
     	
-        String urlAPI = "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.prism.biz.esser.ESLtsSyncLogService/method";//Post方式没有参数在这里
+        String urlAPI = "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.prism.biz.esser.ESLtsSyncLogService/"+method;//Post方式没有参数在这里
         String result = "";
         HttpPost httpRequst = new HttpPost(urlAPI);//创建HttpPost对象
         
