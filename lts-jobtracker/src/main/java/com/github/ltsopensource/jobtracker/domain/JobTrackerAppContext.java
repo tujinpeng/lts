@@ -10,6 +10,7 @@ import com.github.ltsopensource.jobtracker.support.NonRelyOnPrevCycleJobSchedule
 import com.github.ltsopensource.jobtracker.support.OldDataHandler;
 import com.github.ltsopensource.jobtracker.support.checker.ExecutableDeadJobChecker;
 import com.github.ltsopensource.jobtracker.support.checker.ExecutingDeadJobChecker;
+import com.github.ltsopensource.jobtracker.support.checker.ExecutingTooLongJobChecker;
 import com.github.ltsopensource.jobtracker.support.checker.FeedbackJobSendChecker;
 import com.github.ltsopensource.jobtracker.support.cluster.JobClientManager;
 import com.github.ltsopensource.jobtracker.support.cluster.TaskTrackerManager;
@@ -33,6 +34,7 @@ public class JobTrackerAppContext extends AppContext {
     private ExecutingDeadJobChecker executingDeadJobChecker;
     private FeedbackJobSendChecker feedbackJobSendChecker;
     private ExecutableDeadJobChecker executableDeadJobChecker;
+    private ExecutingTooLongJobChecker executingTooLongJobChecker;
 
     // old data handler, dirty data
     private OldDataHandler oldDataHandler;
@@ -216,5 +218,13 @@ public class JobTrackerAppContext extends AppContext {
 
     public void setExecutableDeadJobChecker(ExecutableDeadJobChecker executableDeadJobChecker) {
         this.executableDeadJobChecker = executableDeadJobChecker;
+    }
+
+    public ExecutingTooLongJobChecker getExecutingTooLongJobChecker() {
+        return executingTooLongJobChecker;
+    }
+
+    public void setExecutingTooLongJobChecker(ExecutingTooLongJobChecker executingTooLongJobChecker) {
+        this.executingTooLongJobChecker = executingTooLongJobChecker;
     }
 }
