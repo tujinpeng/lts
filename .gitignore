@@ -1,12 +1,4 @@
-lts-startup/.settings/org.eclipse.m2e.core.prefs
-lts-startup/.settings/org.eclipse.core.resources.prefs
-lts-jobtracker/.settings/org.eclipse.m2e.core.prefs
-lts-jobtracker/.settings/org.eclipse.core.resources.prefs
-lts-admin/.settings/org.eclipse.wst.validation.prefs
-lts-admin/.settings/org.eclipse.wst.common.project.facet.core.xml
-lts-admin/.settings/org.eclipse.wst.common.component
-lts-admin/.settings/org.eclipse.m2e.core.prefs
-lts-admin/.settings/org.eclipse.core.resources.prefs
+
 
 *.class
 *.iml
@@ -17,7 +9,7 @@ lts-admin/.settings/org.eclipse.core.resources.prefs
 .project
 .mymetadata
 /.gradle/
-/.idea/
+.idea/
 /captures/
 .DS_Store
 
@@ -27,3 +19,4 @@ lts-admin/.settings/org.eclipse.core.resources.prefs
 .bin/
 target/
 build/
+dist/
