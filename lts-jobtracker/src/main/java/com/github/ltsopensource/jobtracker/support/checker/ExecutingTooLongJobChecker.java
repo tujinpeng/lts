@@ -56,7 +56,8 @@ public class ExecutingTooLongJobChecker {
             }
 
             if(jobPoLinkedList.size()>= 50){
-                jobPoLinkedList.poll();
+                JobPo tempJob = jobPoLinkedList.poll();
+                jobs.remove(tempJob.getJobId());
             }
             jobPoLinkedList.offer(jobPo);
             jobs.put(jobPo.getJobId(),jobPo.getGmtCreated());
@@ -83,19 +84,19 @@ public class ExecutingTooLongJobChecker {
                     public void run() {
                         try{
 
-                            LOGGER.info("Executing too Long job checker executing...........");
+//                            LOGGER.info("Executing too Long job checker executing...........");
                                 if(!appContext.getRegistryStatMonitor().isAvailable()){
                                     return;
                                 }
                                 //执行时间超过20秒的任务
                                 List<JobPo> tooLongJobs = appContext.getExecutingJobQueue().getDeadJobs(
                                         SystemClock.now() - 20*1000);//20秒
-                                LOGGER.info("too Long Job count:"+tooLongJobs.size());
+//                                LOGGER.info("too Long Job count:"+tooLongJobs.size());
                                 String alarmEmail = appContext.getConfig().getParameter(ExtConfig.ALARM_EMAIL_TO);
                                 if(StringUtils.isEmpty(alarmEmail))
                                     return;
                                 String[] alarmEamils = alarmEmail.split(",");
-                                LOGGER.info("too long alarm email:"+alarmEmail);
+//                                LOGGER.info("too long alarm email:"+alarmEmail);
 
                                 if(CollectionUtils.isNotEmpty(tooLongJobs)){
                                     StringBuilder msg;
@@ -118,7 +119,7 @@ public class ExecutingTooLongJobChecker {
                                             alarmMessage.setType(AlarmType.BLOCK);
                                             for (String to:alarmEamils) {
                                                 alarmMessage.setTo(to);
-                                                LOGGER.info("too long alarm mail:"+to+msg.toString());
+//                                                LOGGER.info("too long alarm mail:"+to+msg.toString());
                                                 emailAlarmNotifier.notice(alarmMessage);
 
                                             }
