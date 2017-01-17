@@ -56,7 +56,8 @@ public class ExecutingTooLongJobChecker {
             }
 
             if(jobPoLinkedList.size()>= 50){
-                jobPoLinkedList.poll();
+                JobPo tempJob = jobPoLinkedList.poll();
+                jobs.remove(tempJob.getJobId());
             }
             jobPoLinkedList.offer(jobPo);
             jobs.put(jobPo.getJobId(),jobPo.getGmtCreated());
