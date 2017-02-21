@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.github.ltsopensource.admin.response.PaginationRsp;
 import com.github.ltsopensource.biz.logger.JobLogger;
@@ -123,7 +125,16 @@ public class EsJobLogger implements JobLogger {
         
         Map<String,Object> map = new HashMap<String,Object>();
     	map.put("pageSize",request.getLimit());
-    	map.put("pageNum",1);//TODO
+    	//eg:第一页(0,10)传送0，第二页(20,10)传送1....
+    	Integer pageNum = request.getStart();
+    	if(pageNum!=0){
+    		if(0==request.getStart()/request.getLimit()){
+    			pageNum = request.getStart()/request.getLimit()-1;
+    		}else{
+    			pageNum = request.getStart()/request.getLimit();
+    		}    		
+    	}
+    	map.put("pageNum",pageNum);//pageNum
     	map.put("parameter",request);
         //String objectCount = JSONObject.toJSONString(request);
         String count = doPost("count", encodeMsg(map));
@@ -137,6 +148,10 @@ public class EsJobLogger implements JobLogger {
 		String searchResult = doPost("query", encodeMsg(map));
 		
 		List<JobLogPo> rows = new ArrayList<JobLogPo>();
+		if(StringUtils.isEmpty(searchResult)){
+			response.setRows(rows);
+			return response;
+		}
 		
 		List<JobLogPo> jobLogPoList= com.alibaba.fastjson.JSONObject.parseArray(searchResult, JobLogPo.class);
 		if (jobLogPoList!=null && !jobLogPoList.isEmpty()) {
@@ -168,7 +183,7 @@ public class EsJobLogger implements JobLogger {
     public static void main(String[] args) throws UnsupportedEncodingException {    	    	
     	/*List<JobLogPo> jobs = new ArrayList<JobLogPo>();
     	JobLogPo jlp1 = new JobLogPo();
-    	jlp1.setBizId("saveOneBizId");
+    	jlp1.setBizId("8888");
     	jlp1.setBizType("saveOneBizType");
     	jlp1.setEventType("saveOneEventType");
     	jlp1.setLogTime(new Date().getTime());
@@ -177,7 +192,7 @@ public class EsJobLogger implements JobLogger {
     	jlp1.setPriority(5);
     	
     	JobLogPo jlp2 = new JobLogPo();
-    	jlp2.setBizId("44");
+    	jlp2.setBizId("8888");
     	jlp2.setBizType("2test");
     	jlp2.setEventType("2test");
     	jlp2.setLogTime(new Date().getTime());
@@ -186,7 +201,7 @@ public class EsJobLogger implements JobLogger {
     	jlp2.setPriority(5);
     	
     	JobLogPo jlp3 = new JobLogPo();
-    	jlp3.setBizId("55");
+    	jlp3.setBizId("8888");
     	jlp3.setBizType("btest");
     	jlp3.setEventType("etest");
     	jlp3.setLogTime(new Date().getTime());
@@ -195,7 +210,7 @@ public class EsJobLogger implements JobLogger {
     	jlp3.setPriority(5);
     	
     	jobs.add(jlp1);
-    	System.out.println("saveResult:"+doPost("saveOne",encodeMsg(jlp1)));
+    	//System.out.println("saveResult:"+doPost("saveOne",encodeMsg(jlp1)));
     	
     	jobs.add(jlp2);
     	jobs.add(jlp3);    	
@@ -203,17 +218,21 @@ public class EsJobLogger implements JobLogger {
     	
     	
     	JobLoggerRequest jlr = new JobLoggerRequest();
-    	jlr.setBizId("saveOneBizId");
-    	//jlr.setEventType("etest");
+    	jlr.setBizId("8888");
+    	jlr.setEventType("etest");
+    	Calendar c = Calendar.getInstance();
+    	c.add(Calendar.DAY_OF_MONTH,-3);
+    	//jlr.setStartLogTimeMill(c.getTimeInMillis());
+    	//jlr.setEndLogTimeMill(new Date().getTime());
     	
     	Map<String,Object> map = new HashMap<String,Object>();
-    	//map.put("pageSize",jlr.getLimit());
-    	//map.put("pageNum",1);
+    	map.put("pageSize",jlr.getLimit());
+    	map.put("pageNum",0);
     	map.put("parameter",jlr);
     	System.out.println("searchParam:"+JSONObject.toJSONString(map));
     	
     	System.out.println("searchCout:"+doPost("count",encodeMsg(map)));
-    	System.out.println("searchResult:"+doPost("query",encodeMsg(map)));    	
+    	System.out.println("searchResult:"+doPost("query",encodeMsg(map)));  	
 	}
    
     /**
