@@ -127,7 +127,7 @@ public class EsJobLogger implements JobLogger {
         
         Map<String,Object> map = new HashMap<String,Object>();
     	map.put("pageSize",request.getLimit());
-    	//eg:第一页(0,10)传送0，第二页(20,10)传送1....
+    	//eg:第一页(0,10)传送0，第二页(10,10)传送1....
     	Integer pageNum = request.getStart();
     	if(pageNum!=0){
     		if(0==request.getStart()/request.getLimit()){
@@ -163,7 +163,8 @@ public class EsJobLogger implements JobLogger {
 		List<?> jobLogPoList= net.sf.json.JSONArray.fromObject(searchResult);
 		if (jobLogPoList!=null && !jobLogPoList.isEmpty()) {
 			for (Object o : jobLogPoList) {
-				JobLogPo po =JSONObject.parseObject(String.valueOf(o),JobLogPo.class);
+				//JobLogPo po =JSONObject.parseObject(String.valueOf(o),JobLogPo.class);
+				JobLogPo po = (JobLogPo)net.sf.json.JSONObject.toBean((net.sf.json.JSONObject)o, JobLogPo.class);
 				rows.add(po);
 			}
 		}
@@ -227,7 +228,7 @@ public class EsJobLogger implements JobLogger {
     	
     	
     	JobLoggerRequest jlr = new JobLoggerRequest();
-    	jlr.setTaskId("3333");
+    	jlr.setTaskId("9999");
     	//jlr.setBizId("0000");
     	//jlr.setEventType("etest");
     	Calendar c = Calendar.getInstance();
