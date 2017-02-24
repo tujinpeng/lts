@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -52,7 +53,8 @@ public class EsJobLogger implements JobLogger {
      */
     public static String doPost(String method,String log){
 		//String urlAPI = "http://localhost:8081/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService/"+method;
-		String urlAPI = "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.prism.biz.esser.IESLtsSyncLogService/"+method;//Post方式没有参数在这里
+		//String urlAPI = "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.prism.biz.esser.IESLtsSyncLogService/"+method;//Post方式没有参数在这里
+		String urlAPI = "http://10.200.4.53:8090/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService/"+method;//ark
         String result = "";
         HttpPost httpRequst = new HttpPost(urlAPI);//创建HttpPost对象
         
@@ -136,9 +138,14 @@ public class EsJobLogger implements JobLogger {
     	}
     	map.put("pageNum",pageNum);//pageNum
     	map.put("parameter",request);
+    	if(null!=request.getStartLogTime() && null!=request.getEndLogTime()){
+    		request.setStartLogTimeMill(request.getStartLogTime().getTime());
+    		request.setEndLogTimeMill(request.getEndLogTime().getTime());
+    	}
+    	
         //String objectCount = JSONObject.toJSONString(request);
         String count = doPost("count", encodeMsg(map));
-        if (null == count || !count.isEmpty() || Long.valueOf(count) == 0L) {
+        if (null == count || count.isEmpty() || Long.valueOf(count) == 0L) {
             return response;
         }
         int cut = Long.valueOf(count).intValue();
@@ -152,10 +159,11 @@ public class EsJobLogger implements JobLogger {
 			response.setRows(rows);
 			return response;
 		}
-		
-		List<JobLogPo> jobLogPoList= com.alibaba.fastjson.JSONObject.parseArray(searchResult, JobLogPo.class);
+		//List<JobLogPo> jobLogPoList= com.alibaba.fastjson.JSONObject.parseArray(searchResult,JobLogPo.class);
+		List<?> jobLogPoList= net.sf.json.JSONArray.fromObject(searchResult);
 		if (jobLogPoList!=null && !jobLogPoList.isEmpty()) {
-			for (JobLogPo po : jobLogPoList) {
+			for (Object o : jobLogPoList) {
+				JobLogPo po =JSONObject.parseObject(String.valueOf(o),JobLogPo.class);
 				rows.add(po);
 			}
 		}
@@ -183,7 +191,7 @@ public class EsJobLogger implements JobLogger {
     public static void main(String[] args) throws UnsupportedEncodingException {    	    	
     	/*List<JobLogPo> jobs = new ArrayList<JobLogPo>();
     	JobLogPo jlp1 = new JobLogPo();
-    	jlp1.setBizId("8888");
+    	jlp1.setBizId("0000");
     	jlp1.setBizType("saveOneBizType");
     	jlp1.setEventType("saveOneEventType");
     	jlp1.setLogTime(new Date().getTime());
@@ -210,16 +218,18 @@ public class EsJobLogger implements JobLogger {
     	jlp3.setPriority(5);
     	
     	jobs.add(jlp1);
-    	//System.out.println("saveResult:"+doPost("saveOne",encodeMsg(jlp1)));
+    	System.out.println("sendMsg:"+encodeMsg(jlp1));
+    	System.out.println("saveResult:"+doPost("saveOne",encodeMsg(jlp1)));
     	
-    	jobs.add(jlp2);
+    	/*jobs.add(jlp2);
     	jobs.add(jlp3);    	
     	System.out.println("saveResult:"+doPost("saveAll",encodeMsg(jobs)));*/
     	
     	
     	JobLoggerRequest jlr = new JobLoggerRequest();
-    	jlr.setBizId("8888");
-    	jlr.setEventType("etest");
+    	jlr.setTaskId("3333");
+    	//jlr.setBizId("0000");
+    	//jlr.setEventType("etest");
     	Calendar c = Calendar.getInstance();
     	c.add(Calendar.DAY_OF_MONTH,-3);
     	//jlr.setStartLogTimeMill(c.getTimeInMillis());
@@ -232,7 +242,7 @@ public class EsJobLogger implements JobLogger {
     	System.out.println("searchParam:"+JSONObject.toJSONString(map));
     	
     	System.out.println("searchCout:"+doPost("count",encodeMsg(map)));
-    	System.out.println("searchResult:"+doPost("query",encodeMsg(map)));  	
+    	System.out.println("searchResult:"+doPost("query",encodeMsg(map)));
 	}
    
     /**
