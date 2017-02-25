@@ -53,8 +53,8 @@ public class EsJobLogger implements JobLogger {
      */
     public static String doPost(String method,String log){
 		//String urlAPI = "http://localhost:8081/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService/"+method;
-		//String urlAPI = "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.prism.biz.esser.IESLtsSyncLogService/"+method;//Post方式没有参数在这里
-		String urlAPI = "http://10.200.4.53:8090/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService/"+method;//ark
+		String urlAPI = "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.prism.biz.esser.IESLtsSyncLogService/"+method;//Post方式没有参数在这里
+		//String urlAPI = "http://10.200.4.53:8090/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService/"+method;//ark
         String result = "";
         HttpPost httpRequst = new HttpPost(urlAPI);//创建HttpPost对象
         
@@ -104,6 +104,11 @@ public class EsJobLogger implements JobLogger {
             return;
         }
         //String object = JSONObject.toJSONString(jobLogPo);
+        if(null!=jobLogPo.getExtParams()){
+        	jobLogPo.setBizId(jobLogPo.getExtParams().get("bizId"));
+        	jobLogPo.setBizType(jobLogPo.getExtParams().get("bizType"));
+        	jobLogPo.setEventType(jobLogPo.getExtParams().get("eventType"));
+        }
         doPost("saveOne", encodeMsg(jobLogPo));
     }
     
@@ -116,6 +121,13 @@ public class EsJobLogger implements JobLogger {
             return;
         }
         //String object = com.alibaba.fastjson.JSON.toJSON(jobLogPos).toString();
+        for(JobLogPo jp: jobLogPos){
+        	if(null!=jp.getExtParams()){
+        		jp.setBizId(jp.getExtParams().get("bizId"));
+        		jp.setBizType(jp.getExtParams().get("bizType"));
+        		jp.setEventType(jp.getExtParams().get("eventType"));
+        	}
+        }
         doPost("saveAll", encodeMsg(jobLogPos));
     }
     /**
@@ -228,8 +240,8 @@ public class EsJobLogger implements JobLogger {
     	
     	
     	JobLoggerRequest jlr = new JobLoggerRequest();
-    	jlr.setTaskId("9999");
-    	//jlr.setBizId("0000");
+    	//jlr.setTaskId("9999");
+    	//jlr.setBizId("20042581");
     	//jlr.setEventType("etest");
     	Calendar c = Calendar.getInstance();
     	c.add(Calendar.DAY_OF_MONTH,-3);
@@ -242,7 +254,7 @@ public class EsJobLogger implements JobLogger {
     	map.put("parameter",jlr);
     	System.out.println("searchParam:"+JSONObject.toJSONString(map));
     	
-    	System.out.println("searchCout:"+doPost("count",encodeMsg(map)));
+    	System.out.println("searchCount:"+doPost("count",encodeMsg(map)));
     	System.out.println("searchResult:"+doPost("query",encodeMsg(map)));
 	}
    
