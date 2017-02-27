@@ -20,8 +20,10 @@ public class JobLoggerRequest extends PaginationReq {
     private String eventType;
 
     private Date startLogTime;
+    private Long startLogTimeMill;
 
     private Date endLogTime;
+    private Long endLogTimeMill;
 
     private String submitNodeGroup;//提交节点组
     
@@ -119,5 +121,21 @@ public class JobLoggerRequest extends PaginationReq {
 		this.success = success;
 	}
 
+	public Long getStartLogTimeMill() {
+		return startLogTimeMill;
+	}
+
+	public void setStartLogTimeMill(Long startLogTimeMill) {
+		this.startLogTimeMill = startLogTimeMill;
+	}
+
+	public Long getEndLogTimeMill() {
+		return endLogTimeMill;
+	}
+
+	public void setEndLogTimeMill(Long endLogTimeMill) {
+		this.endLogTimeMill = endLogTimeMill;
+	}
+	
     
 }
