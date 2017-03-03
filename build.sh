@@ -17,7 +17,7 @@ Dist_Bin_Dir="$(cd "$(dirname "${Dist_Bin_Dir}/.")"; pwd)"
 
 mkdir -p $Dist_Bin_Dir
 
-# 打包
+# 打包lts-jobtracker
 Startup_Dir="$LTS_Bin_Dir/lts-startup/"
 cd $Startup_Dir
 mvn clean assembly:assembly -DskipTests -Pdefault
