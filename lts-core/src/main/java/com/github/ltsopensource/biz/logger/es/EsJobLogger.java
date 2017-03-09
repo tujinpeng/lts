@@ -53,8 +53,9 @@ public class EsJobLogger implements JobLogger {
      */
     public static String doPost(String method,String log){
 		//String urlAPI = "http://localhost:8081/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService/"+method;
-		String urlAPI = "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.prism.biz.esser.IESLtsSyncLogService/"+method;//Post方式没有参数在这里
-		//String urlAPI = "http://10.200.4.53:8090/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService/"+method;//ark
+		String urlAPI = "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService/"+method;//Post方式没有参数在这里
+		//String urlAPI = "http://192.168.0.173:8080/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService/"+method;//fangzhen ip ok";
+		//String urlAPI = "http://10.200.4.53:8090/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService/"+method;//ark ip
         String result = "";
         HttpPost httpRequst = new HttpPost(urlAPI);//创建HttpPost对象
         
@@ -222,7 +223,7 @@ public class EsJobLogger implements JobLogger {
     	jlp2.setPriority(5);
     	
     	JobLogPo jlp3 = new JobLogPo();
-    	jlp3.setBizId("8888");
+    	jlp3.setBizId("8888");o
     	jlp3.setBizType("btest");
     	jlp3.setEventType("etest");
     	jlp3.setLogTime(new Date().getTime());
@@ -232,7 +233,7 @@ public class EsJobLogger implements JobLogger {
     	
     	jobs.add(jlp1);
     	System.out.println("sendMsg:"+encodeMsg(jlp1));
-    	System.out.println("saveResult:"+doPost("saveOne",encodeMsg(jlp1)));
+    	System.out.println("saveResult:"+doPost("saveOne",encodeMsg(jlp1)));*/
     	
     	/*jobs.add(jlp2);
     	jobs.add(jlp3);    	
