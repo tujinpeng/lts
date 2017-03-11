@@ -9,6 +9,15 @@
     <version>1.7.0.lv0.0.1</version>
     <url>https://github.com/ltsopensource/light-task-scheduler.git</url>
 
+    <modules>
+        <module>lts-core</module>
+        <module>lts-jobtracker</module>
+        <module>lts-tasktracker</module>
+        <module>lts-jobclient</module>
+        <module>lts-admin</module>
+        <module>lts-spring</module>
+        <module>lts-monitor</module>
+    </modules>
     <properties>
         <jedis.version>2.7.3</jedis.version>
         <fastjson.version>1.2.7</fastjson.version>
@@ -230,6 +239,11 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-autoconfigure</artifactId>
                 <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.0.13</version>
             </dependency>
             <dependency>
                 <groupId>org.javassist</groupId>
