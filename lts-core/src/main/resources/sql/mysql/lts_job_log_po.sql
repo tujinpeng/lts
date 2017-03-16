@@ -34,6 +34,6 @@ CREATE TABLE IF NOT EXISTS `lts_job_log_po` (
   KEY `task_id_task_tracker_node_group` (`task_id`,`task_tracker_node_group`),
   KEY `bizId` (`bizId`),
   KEY `eventType` (`eventType`),
-  KEY `bizType` (`bizType`)
+  KEY `bizType` (`bizType`),
   KEY `idx_realTaskId_taskTrackerNodeGroup` (`real_task_id`, `task_tracker_node_group`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='任务日志';
