@@ -16,7 +16,6 @@ import com.github.ltsopensource.admin.support.LoginConfigurer;
 import com.github.ltsopensource.core.commons.utils.StringUtils;
 import com.lvmama.comm.pet.po.perm.PermUser;
 import com.lvmama.comm.utils.ServletUtil;
-import com.lvmama.comm.vo.Constant;
 
 /**
  * 抽象过滤器</br>
@@ -26,6 +25,7 @@ import com.lvmama.comm.vo.Constant;
  * @create 2016/10/25
  */
 public abstract class AbsFilter implements Filter {
+	public static final String SESSION_BACK_USER = "SESSION_BACK_USER";
 	/**
 	 * 无授权弹窗的提示信息的key
 	 */
@@ -68,7 +68,7 @@ public abstract class AbsFilter implements Filter {
 	 * @return
 	 */
 	protected PermUser getPermUser(HttpServletRequest request, HttpServletResponse response) {
-		return (PermUser)ServletUtil.getSession(request, response, Constant.SESSION_BACK_USER);
+		return (PermUser)ServletUtil.getSession(request, response, SESSION_BACK_USER);
 	}
 	
 	/**
