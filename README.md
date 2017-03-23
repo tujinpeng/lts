@@ -19,7 +19,7 @@ oschina地址:
 #### 2. lts_executable_job_queue_ (前缀)表名改为 lts_wjq_ (前缀), 缩短表名
 #### 3. lts_feedback_job_queue_ (前缀)表名改为 lts_fjq_ (前缀), 缩短表名
 
-##1.7.0.lv.0.0.1(master)变更主要点
+##1.7.0.lv.1.0.0(master)变更主要点
 1. 增加手动触发任务按钮
 2. 优化PreLoader
 3. 增加批量触发任务
