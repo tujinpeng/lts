@@ -286,7 +286,11 @@
             <artifactId>java_memcached_client</artifactId>
             <version>3.0.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.5.4</version>
+        </dependency>
     </dependencies>
 
     <properties>
