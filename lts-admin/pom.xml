@@ -281,6 +281,12 @@
             <artifactId>lvmama-lang</artifactId>
             <version>1.0.4</version>
         </dependency>
+        <dependency>
+            <groupId>memcached_client</groupId>
+            <artifactId>java_memcached_client</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
     </dependencies>
 
     <properties>
