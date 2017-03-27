@@ -54,7 +54,7 @@ public class NioClientTest {
                 writeFuture.addListener(new IoFutureListener() {
                     @Override
                     public void operationComplete(Future future) throws Exception {
-                        System.out.println(future.isSuccess() + "  ");
+                        System.out.print(future.isSuccess() + "  ");
                         if (!future.isSuccess()) {
                             future.cause().printStackTrace();
                         }

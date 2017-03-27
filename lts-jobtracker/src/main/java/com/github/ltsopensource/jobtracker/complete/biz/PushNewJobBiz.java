@@ -2,14 +2,12 @@ package com.github.ltsopensource.jobtracker.complete.biz;
 
 import com.github.ltsopensource.core.protocol.command.JobCompletedRequest;
 import com.github.ltsopensource.core.protocol.command.JobPushRequest;
-import com.github.ltsopensource.core.support.JobDomainConverter;
 import com.github.ltsopensource.jobtracker.domain.JobTrackerAppContext;
 import com.github.ltsopensource.jobtracker.sender.JobSender;
+import com.github.ltsopensource.core.support.JobDomainConverter;
 import com.github.ltsopensource.queue.domain.JobPo;
 import com.github.ltsopensource.remoting.protocol.RemotingCommand;
 import com.github.ltsopensource.remoting.protocol.RemotingProtos;
-
-import java.util.List;
 
 /**
  * 接受新任务Chain
@@ -44,12 +42,12 @@ public class PushNewJobBiz implements JobCompletedBiz {
      */
     private JobPushRequest getNewJob(String taskTrackerNodeGroup, String taskTrackerIdentity) {
 
-        JobSender.SendResult sendResult = appContext.getJobSender().send(taskTrackerNodeGroup, taskTrackerIdentity, 1, new JobSender.SendInvoker() {
+        JobSender.SendResult sendResult = appContext.getJobSender().send(taskTrackerNodeGroup, taskTrackerIdentity, new JobSender.SendInvoker() {
             @Override
-            public JobSender.SendResult invoke(List<JobPo> jobPos) {
+            public JobSender.SendResult invoke(JobPo jobPo) {
 
                 JobPushRequest jobPushRequest = appContext.getCommandBodyWrapper().wrapper(new JobPushRequest());
-                jobPushRequest.setJobMetaList(JobDomainConverter.convert(jobPos));
+                jobPushRequest.setJobMeta(JobDomainConverter.convert(jobPo));
 
                 return new JobSender.SendResult(true, jobPushRequest);
             }

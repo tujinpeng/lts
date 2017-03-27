@@ -60,7 +60,7 @@ public class MysqlExecutingJobQueue extends AbstractMysqlJobQueue implements Exe
                 .all()
                 .from()
                 .table(getTableName())
-                .where("gmt_modified < ?", deadline)
+                .where("gmt_created < ?", deadline)
                 .list(RshHolder.JOB_PO_LIST_RSH);
     }
 

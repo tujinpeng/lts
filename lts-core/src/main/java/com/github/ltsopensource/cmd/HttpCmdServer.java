@@ -36,9 +36,7 @@ public class HttpCmdServer {
                 // 开启监听命令
                 acceptor = new HttpCmdAcceptor(getServerSocket(), context);
                 acceptor.start();
-                LOGGER.info("\n===========================================================================================\n" +
-                        "Start succeed at port {}\n" +
-                        "===========================================================================================", port);
+                LOGGER.info("Start succeed at port {}", port);
             }
         } catch (Exception t) {
             LOGGER.error("Start error at port {}", port, t);
