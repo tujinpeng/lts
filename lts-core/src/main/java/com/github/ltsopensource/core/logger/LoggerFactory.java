@@ -4,7 +4,6 @@ package com.github.ltsopensource.core.logger;
 import com.github.ltsopensource.core.logger.jcl.JclLoggerAdapter;
 import com.github.ltsopensource.core.logger.jdk.JdkLoggerAdapter;
 import com.github.ltsopensource.core.logger.log4j.Log4jLoggerAdapter;
-import com.github.ltsopensource.core.logger.logback.LogbackLoggerAdapter;
 import com.github.ltsopensource.core.logger.slf4j.Slf4jLoggerAdapter;
 import com.github.ltsopensource.core.logger.support.FailsafeLogger;
 import com.github.ltsopensource.core.spi.ServiceLoader;
@@ -29,9 +28,7 @@ public class LoggerFactory {
     // 查找常用的日志框架
     static {
         String logger = System.getProperty("lts.logger");
-        if ("logback".equals(logger)) {
-            setLoggerAdapter(new LogbackLoggerAdapter());
-        } else if ("slf4j".equals(logger)) {
+        if ("slf4j".equals(logger)) {
             setLoggerAdapter(new Slf4jLoggerAdapter());
         } else if ("jcl".equals(logger)) {
             setLoggerAdapter(new JclLoggerAdapter());
@@ -41,19 +38,15 @@ public class LoggerFactory {
             setLoggerAdapter(new JdkLoggerAdapter());
         } else {
             try {
-                setLoggerAdapter(new LogbackLoggerAdapter());
-            } catch (Throwable e0) {
+                setLoggerAdapter(new Slf4jLoggerAdapter());
+            } catch (Throwable e1) {
                 try {
-                    setLoggerAdapter(new Slf4jLoggerAdapter());
-                } catch (Throwable e1) {
+                    setLoggerAdapter(new Log4jLoggerAdapter());
+                } catch (Throwable e2) {
                     try {
-                        setLoggerAdapter(new Log4jLoggerAdapter());
-                    } catch (Throwable e2) {
-                        try {
-                            setLoggerAdapter(new JclLoggerAdapter());
-                        } catch (Throwable e3) {
-                            setLoggerAdapter(new JdkLoggerAdapter());
-                        }
+                        setLoggerAdapter(new JclLoggerAdapter());
+                    } catch (Throwable e3) {
+                        setLoggerAdapter(new JdkLoggerAdapter());
                     }
                 }
             }

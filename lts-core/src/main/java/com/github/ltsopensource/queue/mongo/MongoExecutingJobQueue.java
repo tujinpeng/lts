@@ -73,7 +73,7 @@ public class MongoExecutingJobQueue extends AbstractMongoJobQueue implements Exe
     @Override
     public List<JobPo> getDeadJobs(long deadline) {
         Query<JobPo> query = template.createQuery(JobPo.class);
-        query.filter("gmtModified < ", deadline);
+        query.filter("gmtCreated < ", deadline);
         return query.asList();
     }
 
