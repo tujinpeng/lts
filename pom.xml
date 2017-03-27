@@ -10,13 +10,7 @@
     <url>https://github.com/ltsopensource/light-task-scheduler.git</url>
 
     <modules>
-        <module>lts-core</module>
         <module>lts-jobtracker</module>
-        <module>lts-tasktracker</module>
-        <module>lts-jobclient</module>
-        <module>lts-admin</module>
-        <module>lts-spring</module>
-        <module>lts-monitor</module>
     </modules>
     <properties>
         <jedis.version>2.7.3</jedis.version>
