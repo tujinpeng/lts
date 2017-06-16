@@ -9,7 +9,7 @@ public class ThreadPoolFactory {
 	private static ThreadPoolExecutor pool;
 	
 	static {
-		pool = new ThreadPoolExecutor(25, 500, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(100));
+		pool = new ThreadPoolExecutor(25, 100, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(300));
 	}
 	
 	private ThreadPoolFactory() {
