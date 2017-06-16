@@ -111,8 +111,13 @@ public class EsJobLogger implements JobLogger
 						logger.error("任务["+content+"]==>"+service+"失败", e);
 		    			
 		    			if(failCount.getAndIncrement() > 30) {
+		    				
 		    				isShutDown = true;
+		    				
 		    				timer.cancel();
+		    				
+		    				logger.error("日志写入ES服务关闭");
+		    			
 		    			}
 		    			
 					}
