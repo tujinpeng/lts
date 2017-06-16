@@ -1,16 +1,141 @@
 package com.github.ltsopensource.biz.logger.es;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.alibaba.fastjson.JSON;
+import com.github.ltsopensource.admin.response.PaginationRsp;
+import com.github.ltsopensource.biz.logger.domain.JobLogPo;
 import com.github.ltsopensource.biz.logger.domain.JobLoggerRequest;
 import com.github.ltsopensource.json.JSONObject;
 
 public class EsJobLoggerTest {
 
+	private static EsJobLogger logger;
+
+	@BeforeClass
+	public static void init() {
+		logger = new EsJobLogger(null);
+	}
+	
+	@Test
+	public void testSave() {
+		
+		JobLogPo log = new JobLogPo();
+		log.setRealTaskId("991000014512");
+		log.setBizId("0000");
+		log.setBizType("saveOneBizType");
+		log.setEventType("saveOneEventType");
+		log.setLogTime(new Date().getTime());
+		log.setMsg("saveOne.msg.test");
+		log.setNeedFeedback(true);
+		log.setPriority(5);
+    	
+    	logger.log(log);
+	
+		CountDownLatch latch = new CountDownLatch(1);
+		try {
+			latch.await(5000, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+	}
+	
+	@Test
+	public void testBatchSave() {
+		
+		List<JobLogPo> jobLogPos = new ArrayList<JobLogPo>();
+		
+		for(int i = 0; i < 3; i++) {
+			
+			JobLogPo log = new JobLogPo();
+			log.setRealTaskId("9910000145"+i);
+			log.setBizId("0000");
+			log.setBizType("saveOneBizType");
+	    	log.setEventType("saveOneEventType");
+	    	log.setLogTime(new Date().getTime());
+	    	log.setMsg("saveOne.msg.test");
+	    	log.setNeedFeedback(true);
+	    	log.setPriority(5);
+			jobLogPos.add(log);
+			
+		}
+		
+		EsJobLogger logger = new EsJobLogger(null);
+		logger.log(jobLogPos);
+	
+		CountDownLatch latch = new CountDownLatch(1);
+		try {
+			latch.await(5000, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	@Test
+	public void testQuery() {
+		
+		EsJobLogger logger = new EsJobLogger(null);
+		JobLoggerRequest request = new JobLoggerRequest();
+		request.setStart(0);
+		request.setLimit(10);
+		request.setRealTaskId("991000014512");
+		
+		PaginationRsp<JobLogPo> result = logger.search(request);
+		System.out.println(JSON.toJSON(result));
+		
+	}
+	
+	@Test
+	public void testFuse() {
+		
+		ThreadPoolExecutor executer = new ThreadPoolExecutor(20, 100, 100, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(100));
+		
+		for(int i = 0; i< 50; i++) {
+			
+			executer.submit(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					testSave();
+				}
+			});
+
+		}
+		
+		CountDownLatch latch = new CountDownLatch(1);
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	
+	
+	
 	/**
      * test method
 	 * 要测试dubbo-rest，需要将http://10.200.3.7/svn/soa/trunk/dubbo-rest拉取到本地启动下(检查下zk注册地址是否和需要调用的dubbo服务注册地址相同)
@@ -70,9 +195,15 @@ public class EsJobLoggerTest {
     	map.put("parameter",jlr);
     	System.out.println("searchParam:"+JSONObject.toJSONString(map));
     	
-    	System.out.println("searchCount:"+jobLogger.doPost("count",encodeMsg(map)));
-    	System.out.println("searchResult:"+jobLogger.doPost("query",encodeMsg(map)));
+    	try {
+			System.out.println("searchCount:"+jobLogger.submitSync("count",encodeMsg(map)));
+			System.out.println("searchResult:"+jobLogger.submitSync("query",encodeMsg(map)));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+    
     private static String encodeMsg(Object oj){
     	if(null==oj){
     		return "";
