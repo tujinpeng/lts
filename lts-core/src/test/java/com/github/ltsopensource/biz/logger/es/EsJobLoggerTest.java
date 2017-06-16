@@ -14,7 +14,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.TestCase;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.alibaba.fastjson.JSON;
 import com.github.ltsopensource.admin.response.PaginationRsp;
@@ -22,10 +23,16 @@ import com.github.ltsopensource.biz.logger.domain.JobLogPo;
 import com.github.ltsopensource.biz.logger.domain.JobLoggerRequest;
 import com.github.ltsopensource.json.JSONObject;
 
-public class EsJobLoggerTest extends TestCase {
+public class EsJobLoggerTest {
 
-	private EsJobLogger logger = new EsJobLogger(null);
+	private static EsJobLogger logger;
+
+	@BeforeClass
+	public static void init() {
+		logger = new EsJobLogger(null);
+	}
 	
+	@Test
 	public void testSave() {
 		
 		JobLogPo log = new JobLogPo();
@@ -50,6 +57,7 @@ public class EsJobLoggerTest extends TestCase {
     	
 	}
 	
+	@Test
 	public void testBatchSave() {
 		
 		List<JobLogPo> jobLogPos = new ArrayList<JobLogPo>();
@@ -82,6 +90,7 @@ public class EsJobLoggerTest extends TestCase {
 		
 	}
 	
+	@Test
 	public void testQuery() {
 		
 		EsJobLogger logger = new EsJobLogger(null);
@@ -95,11 +104,12 @@ public class EsJobLoggerTest extends TestCase {
 		
 	}
 	
+	@Test
 	public void testFuse() {
 		
 		ThreadPoolExecutor executer = new ThreadPoolExecutor(20, 100, 100, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(100));
 		
-		for(int i = 0; i< 200; i++) {
+		for(int i = 0; i< 50; i++) {
 			
 			executer.submit(new Runnable() {
 				
@@ -114,11 +124,12 @@ public class EsJobLoggerTest extends TestCase {
 		
 		CountDownLatch latch = new CountDownLatch(1);
 		try {
-			latch.await(50000, TimeUnit.MILLISECONDS);
+			latch.await();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		
 	}
 	
