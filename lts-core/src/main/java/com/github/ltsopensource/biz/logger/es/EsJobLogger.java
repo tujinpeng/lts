@@ -41,7 +41,7 @@ public class EsJobLogger implements JobLogger
 	
 	private Logger logger = LoggerFactory.getLogger(EsJobLogger.class);
 	
-	private static String ES_URL = "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService";
+	private static String ES_URL = "http://192.168.10.143:8881/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService";
 	
 	private AtomicInteger failCount = new AtomicInteger(0);
 	
