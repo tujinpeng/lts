@@ -50,7 +50,6 @@ public class EsJobLogger implements JobLogger
 	private Timer timer;
 	
 	public EsJobLogger(Config config) {
-		// TODO Auto-generated constructor stub
 		timer = new Timer();
 		timer.scheduleAtFixedRate(new EsFailCntClearTimer(failCount), 1000, 60*1000);
 	}
