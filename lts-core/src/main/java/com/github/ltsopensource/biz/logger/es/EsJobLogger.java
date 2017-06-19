@@ -97,32 +97,37 @@ public class EsJobLogger implements JobLogger
     	if(!isShutDown) {
     		
     		//异步处理+熔断控制
-    		ThreadPoolFactory.getThreadPool().submit(new Runnable() {
-				
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					try {
+    		try {
+				ThreadPoolFactory.getThreadPool().submit(new Runnable() {
 					
-						submitSync(service, content);
-					
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						logger.error("任务["+content+"]==>"+service+"失败", e);
-		    			
-		    			if(failCount.getAndIncrement() > 30) {
-		    				
-		    				isShutDown = true;
-		    				
-		    				timer.cancel();
-		    				
-		    				logger.error("日志写入ES服务关闭");
-		    			
-		    			}
-		    			
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						try {
+							
+							submitSync(service, content);
+							
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							logger.error("任务["+content+"]==>"+service+"失败", e);
+							
+							if(failCount.getAndIncrement() > 30) {
+								
+								isShutDown = true;
+								
+								timer.cancel();
+								
+								logger.error("日志写入ES服务关闭");
+							
+							}
+							
+						}
 					}
-				}
-			});
+				});
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				logger.error("提交线程池写入任务日志失败", e);
+			}
     		
     	}
     	
@@ -131,6 +136,8 @@ public class EsJobLogger implements JobLogger
     
 	public String submitSync(String service, String content) throws IOException {
 
+		long start = System.currentTimeMillis();
+		
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("type", "java.lang.String");
         map.put("value", URLEncoder.encode(content, "utf-8"));
@@ -164,6 +171,8 @@ public class EsJobLogger implements JobLogger
 			if(httpPost!=null) {
 				httpPost.releaseConnection();
 			}
+			
+			logger.info(service+"日志耗时:"+(System.currentTimeMillis()-start));
 		}
 		
         
