@@ -20,8 +20,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,13 +33,15 @@ import com.github.ltsopensource.biz.logger.es.util.HttpClientFactory;
 import com.github.ltsopensource.biz.logger.es.util.ThreadPoolFactory;
 import com.github.ltsopensource.core.cluster.Config;
 import com.github.ltsopensource.core.commons.utils.CollectionUtils;
+import com.github.ltsopensource.core.logger.Logger;
+import com.github.ltsopensource.core.logger.LoggerFactory;
 
 public class EsJobLogger implements JobLogger
 {
 	
 	private Logger logger = LoggerFactory.getLogger(EsJobLogger.class);
 	
-	private static String ES_URL = "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService";
+	private static String ES_URL = "http://192.168.10.143:8881/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService";
 	
 	private AtomicInteger failCount = new AtomicInteger(0);
 	
