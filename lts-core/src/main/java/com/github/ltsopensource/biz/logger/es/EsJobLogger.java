@@ -41,7 +41,7 @@ public class EsJobLogger implements JobLogger
 	
 	private Logger logger = LoggerFactory.getLogger(EsJobLogger.class);
 	
-	private static String ES_URL = "http://192.168.10.143:8881/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService";
+	private static String ES_URL;
 	
 	private AtomicInteger failCount = new AtomicInteger(0);
 	
@@ -50,8 +50,12 @@ public class EsJobLogger implements JobLogger
 	private Timer timer;
 	
 	public EsJobLogger(Config config) {
+		
 		timer = new Timer();
 		timer.scheduleAtFixedRate(new EsFailCntClearTimer(failCount), 1000, 60*1000);
+		
+		ES_URL = config.getParameter("es.log.url");
+		
 	}
 
 	@Override
