@@ -55,7 +55,7 @@ public class EsJobLogger implements JobLogger
 		timer.scheduleAtFixedRate(new EsFailCntClearTimer(failCount), 1000, 60*1000);
 		
 		ES_URL = config.getParameter("es.log.url");
-		System.out.println(ES_URL);
+		
 	}
 
 	@Override
