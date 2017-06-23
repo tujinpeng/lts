@@ -4,8 +4,8 @@ import com.github.ltsopensource.core.domain.Action;
 import com.github.ltsopensource.tasktracker.Result;
 import com.github.ltsopensource.tasktracker.runner.JobContext;
 import com.github.ltsopensource.tasktracker.runner.JobRunner;
-import com.lvmama.tnt.pushplatform.dto.UpdateMessage;
-import com.lvmama.tnt.pushplatform.service.UpdateService;
+import com.lvmama.tnt.pushplatform.push.dto.UpdateMessage;
+import com.lvmama.tnt.pushplatform.push.service.UpdateService;
 
 public class UpdateJobRunner implements JobRunner {
 

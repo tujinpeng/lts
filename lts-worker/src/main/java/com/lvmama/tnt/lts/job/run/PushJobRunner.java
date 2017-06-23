@@ -1,25 +1,39 @@
 package com.lvmama.tnt.lts.job.run;
 
 import com.github.ltsopensource.core.domain.Action;
+import com.github.ltsopensource.core.domain.Job;
 import com.github.ltsopensource.tasktracker.Result;
 import com.github.ltsopensource.tasktracker.runner.JobContext;
 import com.github.ltsopensource.tasktracker.runner.JobRunner;
-import com.lvmama.tnt.pushplatform.dto.PushMessage;
-import com.lvmama.tnt.pushplatform.service.PushService;
+import com.lvmama.tnt.lts.job.constant.JobParamEnum;
+import com.lvmama.tnt.pushplatform.push.dto.PushMessage;
+import com.lvmama.tnt.pushplatform.push.service.PushSendService;
 
 public class PushJobRunner implements JobRunner {
 
-	private PushService pushService;
+	private PushSendService pushService;
 
 	public Result run(JobContext jobContext) throws Throwable {
-		PushMessage pushMessage = convert(jobContext);
+		Job job = jobContext.getJob();
+		PushMessage pushMessage = convert(job);
 		pushService.push(pushMessage);
 		return new Result(Action.EXECUTE_SUCCESS);
 	}
 
-	private PushMessage convert(JobContext jobContext) {
-		PushMessage pushTarget = new PushMessage();
-		return pushTarget;
+	private PushMessage convert(Job job) {
+		String objectId = job.getParam(JobParamEnum.BIZID.name());
+		String eventType = job.getParam(JobParamEnum.pushEventType.name());
+		String objectType = convertEventType(eventType);
+
+		PushMessage pushMessage = new PushMessage();
+		pushMessage.setObjectId(objectId);
+		pushMessage.setObjectType(objectType);
+		pushMessage.setEventType(eventType);
+		return pushMessage;
+	}
+
+	private String convertEventType(String eventType) {
+		return null;
 	}
 
 }
