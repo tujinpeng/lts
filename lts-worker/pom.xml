@@ -1,37 +1,40 @@
 <?xml version="1.0"?>
 <project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.lvmama.boot</groupId>
-		<artifactId>lvmama-boot</artifactId>
-		<version>1.0.0</version>
-	</parent>
-	<groupId>com.lvmama.tnt.lts</groupId>
-	<artifactId>lts-worker</artifactId>
-	<name>lts-worker</name>
-	<url>http://maven.apache.org</url>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>com.github.ltsopensource</groupId>
-			<artifactId>lts-tasktracker</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.github.ltsopensource</groupId>
-			<artifactId>lts-spring</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.lvmama.tnt.pushplatform</groupId>
-			<artifactId>push-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>lts-parent</artifactId>
+        <groupId>com.github.ltsopensource</groupId>
+        <version>1.7.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>lts-worker</artifactId>
+    <name>lts-worker</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.ltsopensource</groupId>
+            <artifactId>lts-tasktracker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ltsopensource</groupId>
+            <artifactId>lts-spring</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lvmama.tnt.pushplatform</groupId>
+            <artifactId>push-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${springframework.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>
