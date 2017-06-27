@@ -24,6 +24,12 @@ done
 
 # echo $CLASSPATH
 
+#日志输出目录
+LOG_HOME="${JOB_TRACKER_HOME}/../."
+LOG_HOME="$(cd "$(dirname "${LOG_HOME}")"; pwd)"
+LOG_HOME="$LOG_HOME/logs"
+JVMFLAGS="$JVMFLAGS -Dlogs=$LOG_HOME"
+
 NODE_NAME="$1"  # zoo
 
 # 转化为绝对路径
