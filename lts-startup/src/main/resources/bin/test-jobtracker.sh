@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # JVMFLAGS JVM参数可以在这里设置
-JVMFLAGS='-Dfile.encoding=UTF-8 -server -Xmx10240m -Xms10240m -Xss512k -XX:PermSize=256m -XX:MaxPermSize=256m'
+JVMFLAGS='-Dfile.encoding=UTF-8 -server -Xmx1024m -Xms1024m -Xss512k -XX:PermSize=256m -XX:MaxPermSize=256m'
 
 JOB_TRACKER_HOME="${BASH_SOURCE-$0}"
 JOB_TRACKER_HOME="$(dirname "${JOB_TRACKER_HOME}")"
@@ -24,6 +24,11 @@ done
 
 # echo $CLASSPATH
 
+#日志输出目录
+LOG_HOME="${JOB_TRACKER_HOME}/../."
+LOG_HOME="$(cd "$(dirname "${LOG_HOME}")"; pwd)"
+LOG_HOME="$LOG_HOME/logs"
+JVMFLAGS="$JVMFLAGS -Dlogs=$LOG_HOME"
 
 NODE_NAME="$1"  # zoo
 
@@ -32,7 +37,7 @@ CONF_HOME="${JOB_TRACKER_HOME}/../."
 CONF_HOME="$(cd "$(dirname "${CONF_HOME}")"; pwd)"
 CONF_HOME="$CONF_HOME/WEB-INF/classes/$NODE_NAME"
 
-_LTS_DAEMON_OUT="/opt/apache-tomcat-lts-jobtracker/logs/catalina.out"
+_LTS_DAEMON_OUT="$JOB_TRACKER_HOME/../logs/jobtracker-$NODE_NAME.out"
 LTS_MAIN="com.github.ltsopensource.startup.jobtracker.JobTrackerStartup"
 
 LTS_PID_FILE="$JOB_TRACKER_HOME/../pid/jobtracker-$NODE_NAME.pid"
