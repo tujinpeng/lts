@@ -305,6 +305,8 @@ public abstract class AbstractRemoting {
                 once.release();
                 LOGGER.warn("write send a request command to channel <" + channel.remoteAddress() + "> failed.");
                 throw new RemotingSendRequestException(RemotingHelper.parseChannelRemoteAddr(channel), e);
+            }finally {
+                responseFuture.release();
             }
         } else {
             if (timeoutMillis <= 0) {
