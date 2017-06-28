@@ -8,14 +8,9 @@ import com.github.ltsopensource.tasktracker.runner.JobRunner;
 import com.lvmama.tnt.lts.job.constant.JobParamEnum;
 import com.lvmama.tnt.pushplatform.push.dto.PushMessage;
 import com.lvmama.tnt.pushplatform.push.service.PushSendService;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
-public class PushJobRunner implements JobRunner,InitializingBean,ApplicationContextAware {
+public class PushJobRunner implements JobRunner {
 
-	private ApplicationContext applicationContext;
 	private PushSendService pushSendService;
 
 	public Result run(JobContext jobContext) throws Throwable {
@@ -41,15 +36,4 @@ public class PushJobRunner implements JobRunner,InitializingBean,ApplicationCont
 		this.pushSendService = pushSendService;
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		if (pushSendService == null) {
-			pushSendService = (PushSendService) applicationContext.getBean("pushSendService");
-		}
-	}
-
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.applicationContext = applicationContext;
-	}
 }
