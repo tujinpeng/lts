@@ -8,7 +8,6 @@ import com.github.ltsopensource.core.support.CronExpression;
 import com.github.ltsopensource.remoting.annotation.NotNull;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
