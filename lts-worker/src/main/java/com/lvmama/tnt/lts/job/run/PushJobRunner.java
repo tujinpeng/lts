@@ -23,7 +23,7 @@ public class PushJobRunner implements JobRunner {
 	private PushMessage convert(Job job) {
 		String objectId = job.getParam(JobParamEnum.BIZID.name());
 		String eventType = job.getParam(JobParamEnum.pushEventType.name());
-		String objectType = convertEventType(eventType);
+		String objectType = convertObjectType(eventType);
 
 		PushMessage pushMessage = new PushMessage();
 		pushMessage.setObjectId(objectId);
@@ -32,8 +32,11 @@ public class PushJobRunner implements JobRunner {
 		return pushMessage;
 	}
 
-	private String convertEventType(String eventType) {
-		return null;
+	private String convertObjectType(String eventType) {
+		return "product";
 	}
 
+	public void setPushService(PushSendService pushService) {
+		this.pushService = pushService;
+	}
 }
