@@ -23,7 +23,7 @@ public class PushJobRunner implements JobRunner {
 	private PushMessage convert(Job job) {
 		String objectId = job.getParam(JobParamEnum.BIZID.name());
 		String eventType = job.getParam(JobParamEnum.pushEventType.name());
-		String objectType = convertObjectType(eventType);
+		String objectType = job.getParam(JobParamEnum.objectType.name());
 
 		PushMessage pushMessage = new PushMessage();
 		pushMessage.setObjectId(objectId);
