@@ -1,12 +1,10 @@
-package com.lvmama.tnt.lts.job.run;
+package com.github.ltsopensource.spring.tasktracker;
+
+import com.github.ltsopensource.tasktracker.runner.JobRunner;
+import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Iterator;
 import java.util.Map;
-
-import org.springframework.beans.factory.InitializingBean;
-
-import com.github.ltsopensource.spring.tasktracker.MethodInvokingJobRunner;
-import com.github.ltsopensource.tasktracker.runner.JobRunner;
 
 public class BatchMethodInvokingJobRunner implements InitializingBean {
 
