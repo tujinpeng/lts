@@ -10,6 +10,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.github.ltsopensource.core.commons.utils.StringUtils;
+
 /**
  * 登录验证与授权：
  * 		验证01：是否为配置文件(lts-login.cfg)中用户已登录
@@ -33,7 +35,10 @@ public class LoginFilter extends AbsFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse)res;
 		
 		//是否为无条件放行的URL
+
 		String url = request.getRequestURI();
+		url = url.replace(request.getContextPath(), "");
+		
 		if(isExcludedUrl(url)){
 			chain.doFilter(request, response);
 			return;
