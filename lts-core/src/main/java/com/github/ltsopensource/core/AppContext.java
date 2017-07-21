@@ -6,6 +6,7 @@ import com.github.ltsopensource.core.cluster.MasterElector;
 import com.github.ltsopensource.core.cluster.SubscribedNodeManager;
 import com.github.ltsopensource.core.monitor.MStatReporter;
 import com.github.ltsopensource.core.protocol.command.CommandBodyWrapper;
+import com.github.ltsopensource.core.registry.Registry;
 import com.github.ltsopensource.core.registry.RegistryStatMonitor;
 import com.github.ltsopensource.ec.EventCenter;
 
@@ -31,6 +32,8 @@ public abstract class AppContext {
     private RegistryStatMonitor registryStatMonitor;
     // 命令中心
     private HttpCmdServer httpCmdServer;
+    // 配置中心
+    private Registry registry;
 
     public MStatReporter getMStatReporter() {
         return mStatReporter;
@@ -95,4 +98,13 @@ public abstract class AppContext {
     public void setHttpCmdServer(HttpCmdServer httpCmdServer) {
         this.httpCmdServer = httpCmdServer;
     }
+
+	public Registry getRegistry() {
+		return registry;
+	}
+
+	public void setRegistry(Registry registry) {
+		this.registry = registry;
+	}
+    
 }

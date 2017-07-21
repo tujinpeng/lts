@@ -13,10 +13,7 @@ public interface ExtConfig {
     String LAZY_JOB_LOGGER_CHECK_PERIOD = "lazy.job.logger.check.period";
     String LAZY_JOB_LOGGER_BATCH_FLUSH_SIZE = "lazy.job.logger.batch.flush.size";
     String LAZY_JOB_LOGGER_OVERFLOW_SIZE = "lazy.job.logger.overflow.size";
-    /**
-     * JobClient,JobTracker,TaskTracker端: 远程通讯请求处理线程数量, 默认 32 + AVAILABLE_PROCESSOR * 5
-     */
-    String PROCESSOR_THREAD = "lts.job.processor.thread";
+
     /**
      * JobClient,JobTracker,TaskTracker端: Java 编译器, 可选值 jdk, javassist, 默认 javassist
      */
@@ -218,4 +215,33 @@ public interface ExtConfig {
     String JOB_RETRY_TIME_GENERATOR = "jobtracker.retry.time.generator";
 
     String M_STAT_REPORTER_CLOSED  = "mStatReporterClosed";
+    
+    /**
+     * JobClient,JobTracker,TaskTracker端: 远程通讯请求处理线程数量, 默认 32 + AVAILABLE_PROCESSOR * 5
+     */
+    String PROCESSOR_THREAD = "lts.job.processor.thread";
+    
+    /**
+     * JobTracker推送线程数
+     */
+    String PUSH_THREAD = "lts.job.push.thread";
+    
+    /**
+     * Job预加载配置
+     */
+    String PRELOADER_LAOD_SIZE = "preloader.load.size";
+    String PRELOADER_LAOD_FACTOR = "preloader.factor";
+    String PRELOADER_LAOD_DELAY = "preloader.delay";
+    
+    /**
+     * TaskTracker拉取任务频率
+     */
+    String TASK_PULL_RATE = "task.pull.rate";
+    
+    /**
+     * TaskTracker工作线程数
+     */
+    String TASK_WORK_THREAD = "lts.task.work.thread";
+    
+    
 }

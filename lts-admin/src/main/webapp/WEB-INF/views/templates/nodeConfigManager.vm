@@ -1,0 +1,383 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-12">
+        <h2>节点配置管理</h2>
+        <ol class="breadcrumb">
+            <li><a>节点管理</a></li>
+            <li class="active"><b>节点配置管理</b></li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h3><span class="text-navy">节点配置管理</span></h3>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" id="searchForm" class="form-horizontal" onsubmit="return false">
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">节点组</label>
+
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="nodeGroup"
+                                       placeholder="请输入节点组">
+                            </div>
+                            <label class="col-sm-1 control-label">节点类型</label>
+
+                            <div class="col-sm-2">
+                                <select name="nodeType" class="form-control">
+                                    <option value="">所有</option>
+                                    <option value="JOB_TRACKER">JOB_TRACKER</option>
+                                    <option value="TASK_TRACKER">TASK_TRACKER</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-1" style="margin-left:10px;width:70px;">
+                                <button class="btn btn-primary" type="button" id="searchBtn">
+                                    搜索
+                                </button>
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-warning" type="button" id="addBtn">
+                                    添加
+                                </button>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-content" id="ltstableContainer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="ltstable" type="text/html">
+    <table class="table table-stripped toggle-arrow-tiny footable" data-page-size="10">
+        <thead>
+        <tr>
+            <th data-toggle="true">节点类型</th>
+            <th>节点组名</th>
+            <th>配置名称</th>
+            <th>配置值</th>
+            <th>配置描述</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{each rows as row index}}
+        <tr>
+            <td class="nodeType">{{row.nodeType}}</td>
+            <td class="nodeGroup">{{row.nodeGroup}}</td>
+            <td class="configName">{{row.configName}}</td>
+            <td class="configValue">{{row.configValue}}</td>
+            <td class="remark">{{row.remark}}</td>
+            <td>{{row.opt | format:'optFormat',row}}</td>
+        </tr>
+        {{/each}}
+        {{if results == 0}}
+        <tr>
+            <td colspan="4">暂无数据</td>
+        </tr>
+        {{/if}}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="4">
+                <span>共{{results}}条记录，每页展示{{pageSize}}条</span>
+                <ul class="pagination-sm pull-right"></ul>
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+</script>
+
+
+
+<div class="modal inmodal" id="node-config-modal" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content animated rubberBand">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">关闭</span></button>
+                <h2 class="modal-title">节点配置信息</h2>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="nodeConfigInfo">
+					<div class="wrapper wrapper-content animated fadeInRight">
+					    <div class="row">
+					        <div class="col-lg-12">
+					            <div class="ibox">
+					                <div class="ibox-title">
+					                    <h3><span class="text-navy">添加配置</span></h3>
+					                </div>
+					                <div class="ibox-content">
+					                    <form method="post" id="editForm" class="form-horizontal" onsubmit="return false">
+					                    	<input name="id" type="hidden" class="form-control"/>
+					                        <div class="form-group">
+					                            <label class="col-sm-4 control-label">配置名称</label>
+					
+					                            <div class="col-sm-6">
+					                                <input type="text" class="form-control" name="configName"
+					                                       placeholder="请输入配置名称【必填】">
+					                            </div>
+					                        </div>
+											
+											<div class="form-group">
+					                            <label class="col-sm-4 control-label">配置值</label>
+					
+					                            <div class="col-sm-6">
+					                                <input type="text" class="form-control" name="configValue"
+					                                       placeholder="请输入配置值【必填】">
+					                            </div>
+					                        </div>
+					                        
+					                        <div class="form-group">
+					                            <label class="col-sm-4 control-label">配置描述</label>
+					
+					                            <div class="col-sm-6">
+					                                <input type="text" class="form-control" name="remark"
+					                                       placeholder="请输入配置描述">
+					                            </div>
+					                        </div>
+					                        
+					                        <div class="form-group">
+					                            <label class="col-sm-4 control-label">节点类型</label>
+					
+					                            <div class="col-sm-6">
+					                                <select name="node-type" class="form-control">
+					                                    <option value="">-- 请选择节点类型--</option>
+					                                   	<option value="JOB_TRACKER">JOB_TRACKER</option>
+					                                   	<option value="TASK_TRACKER">TASK_TRACKER</option>
+					                                </select>
+					                            </div>
+					                        </div>
+					                        
+					                        <div class="form-group node-group" style="display:none;">
+					                            <label class="col-sm-4 control-label">节点组</label>
+					
+					                            <div class="col-sm-6">
+					                                <select name="nodeGroup" class="form-control">
+					                                    <option value="">-- 请选择节点组 --</option>
+					                                     #foreach($nodeGroup in $taskTrackerNodeGroups)
+					                                        <option value="$nodeGroup.name">$nodeGroup.name</option>
+					                                    #end
+					                                </select>
+					                            </div>
+					                        </div>
+					                        
+					                        <div class="hr-line-dashed"></div>
+					                        <div class="form-group">
+					                            <div class="col-sm-1 col-sm-offset-6" style="width:70px;">
+					                                <button class="btn btn-primary" type="button" id="saveBtn">
+					                                    保存
+					                                </button>
+					                            </div>
+					                            <div class="col-sm-1">
+					                                <button class="btn btn-warning" type="reset" id="resetBtn">
+					                                    重置
+					                                </button>
+					                            </div>
+					                        </div>
+					                    </form>
+					                </div>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+
+        LTS.colFormatter.optFormat = function (v, row) {
+            return '<a href="javascript:;" class="editBtn" configId="' + row.id + '">' +
+                    '<span class="label label-primary" style="background-color: #23c6c8;"><i class="fa fa-trash-o"></i> 编辑</span></a>'
+                    +'&nbsp;&nbsp;'+
+            '<a href="javascript:;" class="deleteBtn" configId="' + row.id + '">' +
+                    '<span class="label label-primary" style="background-color: #DD6B55;"><i class="fa fa-trash-o"></i> 删除</span></a>';
+        }
+        var ltsTable = $("#ltstableContainer").ltsTable({
+            url: 'api/node/node-config-get',
+            templateId: 'ltstable'
+        });
+
+        $(document).on("click", "#searchBtn", function () {
+            var params = {};
+            $.each($('#searchForm .form-control'), function () {
+                var name = $(this).attr("name");
+                var value = $(this).val();
+                params[name] = value;
+            });
+            ltsTable.post(params, 1);
+        });
+        
+        $(document).on("click", "#addBtn", function(){
+        	
+        	$("#resetBtn").trigger("click");
+        	$('#editForm input[type=hidden]').val('');
+        	$('#editForm select[name=node-type]').trigger("changed.bs.select");
+        	
+        	$("#node-config-modal").modal("show");
+            
+        });
+        
+        var oldConfig = null;
+        
+        $(document).on("click", ".editBtn", function(){
+        	
+        	$("#resetBtn").trigger("click");
+        	
+        	var tr = $(this).parents("tr");
+        	$('#editForm input[name=id]').val($(this).attr("configId"))
+   			$('#editForm input[name=configName]').val($('.configName', tr).text());
+        	$('#editForm input[name=configValue]').val($('.configValue', tr).text());
+        	$('#editForm input[name=remark]').val($('.remark', tr).text());
+        	$('#editForm select[name=node-type]').selectpicker('val', $('.nodeType', tr).text());
+        	$('#editForm select[name=nodeGroup]').selectpicker('val', $('.nodeGroup', tr).text());
+        	
+        	$('#editForm select[name=node-type]').trigger("changed.bs.select");
+        	
+        	oldConfig = getFormParams();
+        	
+        	$("#node-config-modal").modal("show");
+            
+        });
+        
+		
+		$(document).on("click", "#saveBtn", function () {
+		
+            var params = getFormParams();
+            
+            // check form
+            if (!params['configName']) {
+                sweetAlert("请输入配置名称", "请输入节点配置名称【必填】", "error");
+                return;
+            }
+            
+            if (!params['configValue']) {
+                sweetAlert("请输入配置值", "请输入节点配置值【必填】", "error");
+                return;
+            }
+            
+            if (!params['nodeType']) {
+                sweetAlert("请选择节点类型", "请选择节点类型【必填】", "error");
+                return;
+            }
+            
+            if (params['nodeType']=='TASK_TRACKER' && !params['nodeGroup']) {
+                sweetAlert("请输入节点组名称", "请输入节点组名称【必填】", "error");
+                return;
+            }
+
+			var url = null;
+			if(params.id) {
+				url = 'api/node/node-config-update';
+				params.id = $('#editForm input[type=hidden]').val();
+				params = {"newConfig": params, "oldConfig": oldConfig}
+			} else {
+				url = 'api/node/node-config-add';
+			}
+            
+            
+            $.ajax({
+                url: url,
+                type: 'POST',
+                dataType: 'json',
+                data: JSON.stringify(params),
+                contentType:"application/json;charset=utf-8",
+                success: function (json) {
+                    if (json && json.success) {
+                        swal('保存成功');
+                        $('#editForm input[type=hidden]').val()
+                     	$("#node-config-modal").modal("hide");
+                     	$("#searchBtn").trigger("click");
+                    } else {
+                        if (json) {
+                            swal(json['msg']);
+                        }
+                    }
+                }
+
+            });
+        });
+
+        $(document).on("click", ".deleteBtn", function () {
+          
+            var params = {};
+            var tr = $(this).parents("tr");
+            params.id = $(this).attr("configId");
+   			params.configName = $('.configName', tr).text();
+        	params.nodeType = $('.nodeType', tr).text();
+        	params.nodeGroup = $('.nodeGroup', tr).text();
+
+            swal({
+                title: "确认要删除该节点配置吗？",
+                text: "对应的该节点配置将被删除，请谨慎操作 !",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确认删除",
+                closeOnConfirm: false
+            }, function (isConfirm) {
+                if(isConfirm){
+                    $.ajax({
+                        url: 'api/node/node-config-delete',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: params,
+                        success: function (json) {
+                            if (json && json.success) {
+                                swal("删除成功!", "恭喜你", "success");
+                                $("#searchBtn").trigger("click");
+                            } else {
+                                json ? swal(json['msg']) : {};
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        
+        function getFormParams() {
+		
+			var params = {};
+            $.each($('#editForm').parent().find(".form-control"), function () {
+                var name = $(this).attr("name");
+                if(name=='node-type') {
+                	name = 'nodeType'; //nodeType名称 reset不起作用
+                }
+                var value = $(this).val().trim();
+                params[name] = value;
+            });
+            
+            return params;
+		}
+		
+		$("#editForm select[name='node-type']").on("changed.bs.select", function() {
+			var nodeType = $(this).val();
+			var nodeGroup = $(".node-group");
+			if(nodeType=="TASK_TRACKER") {
+				nodeGroup.show();	
+            } else {
+            	nodeGroup.hide();
+            	$("#editForm select[name='nodeGroup']").selectpicker('val', '');
+            }
+		});
+
+        $("#searchBtn").trigger("click");
+    });
+</script>

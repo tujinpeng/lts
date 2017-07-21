@@ -17,6 +17,7 @@
                 <ul class="nav nav-second-level collapse">
                     <li><a href="${contextPath}/node-manager.htm">节点管理</a></li>
                     <li><a href="${contextPath}/node-group-manager.htm">节点组管理</a></li>
+                    <li><a href="${contextPath}/node-config-manager.htm">节点配置管理</a></li>                   
                 </ul>
             </li>
             <li>

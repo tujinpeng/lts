@@ -1,17 +1,22 @@
 package com.github.ltsopensource.core.cluster;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+
 import com.github.ltsopensource.core.AppContext;
 import com.github.ltsopensource.core.constant.Constants;
 import com.github.ltsopensource.core.constant.ExtConfig;
 import com.github.ltsopensource.core.factory.NamedThreadFactory;
+import com.github.ltsopensource.core.registry.Registry;
+import com.github.ltsopensource.core.registry.RegistryFactory;
 import com.github.ltsopensource.core.remoting.RemotingServerDelegate;
 import com.github.ltsopensource.core.spi.ServiceLoader;
 import com.github.ltsopensource.remoting.RemotingProcessor;
 import com.github.ltsopensource.remoting.RemotingServer;
 import com.github.ltsopensource.remoting.RemotingServerConfig;
 import com.github.ltsopensource.remoting.RemotingTransporter;
-
-import java.util.concurrent.Executors;
+import com.github.ltsopensource.zookeeper.DataListener;
 
 /**
  * @author Robert HG (254963746@qq.com) on 8/18/14.
@@ -27,9 +32,7 @@ public abstract class AbstractServerNode<T extends Node, App extends AppContext>
 
         RemotingProcessor defaultProcessor = getDefaultProcessor();
         if (defaultProcessor != null) {
-            int processorSize = config.getParameter(ExtConfig.PROCESSOR_THREAD, Constants.DEFAULT_PROCESSOR_THREAD);
-            remotingServer.registerDefaultProcessor(defaultProcessor,
-                    Executors.newFixedThreadPool(processorSize, new NamedThreadFactory(AbstractServerNode.class.getSimpleName(), true)));
+            remotingServer.registerDefaultProcessor(defaultProcessor, getDefaultExecutor());            
         }
     }
 
@@ -53,6 +56,9 @@ public abstract class AbstractServerNode<T extends Node, App extends AppContext>
 
         remotingServer = new RemotingServerDelegate(getRemotingServer(remotingServerConfig), appContext);
 
+        registry = RegistryFactory.getRegistry(appContext);
+        appContext.setRegistry(registry);
+        
         beforeStart();
     }
 
@@ -87,6 +93,39 @@ public abstract class AbstractServerNode<T extends Node, App extends AppContext>
     protected abstract void afterStop();
 
     protected abstract void beforeStop();
+    
+    private ExecutorService getDefaultExecutor() {
+    	
+    	Registry registry = appContext.getRegistry();
+    	String path = registry.getAbsolutePath(config, ExtConfig.PROCESSOR_THREAD);
+        
+    	final int processorSize = registry.getConfig(path, 
+        		config.getParameter(ExtConfig.PROCESSOR_THREAD, Constants.DEFAULT_PROCESSOR_THREAD));
+        
+        final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.
+        		newFixedThreadPool(processorSize, new NamedThreadFactory(AbstractServerNode.class.getSimpleName(), true));
+        
+        registry.addListener(path, new DataListener() {
+			
+			@Override
+			public void dataDeleted(String dataPath) throws Exception {
+				// TODO Auto-generated method stub
+				int processorSize = config.getParameter(ExtConfig.PROCESSOR_THREAD, Constants.DEFAULT_PROCESSOR_THREAD);
+				executor.setCorePoolSize(processorSize);
+				executor.setMaximumPoolSize(processorSize);
+			}
+			
+			@Override
+			public void dataChange(String dataPath, Object data) throws Exception {
+				// TODO Auto-generated method stub
+				executor.setCorePoolSize((int)data);
+				executor.setMaximumPoolSize((int)data);
+			}
+		});
+        
+        return executor;
+        
+    }
 
 
 }

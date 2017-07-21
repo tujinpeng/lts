@@ -1,5 +1,7 @@
 package com.github.ltsopensource.tasktracker;
 
+import java.util.Map;
+
 import com.github.ltsopensource.core.cluster.AbstractClientNode;
 import com.github.ltsopensource.core.constant.ExtConfig;
 import com.github.ltsopensource.core.constant.Level;
@@ -23,6 +25,7 @@ public class TaskTracker extends AbstractClientNode<TaskTrackerNode, TaskTracker
 
     @Override
     protected void beforeStart() {
+    	
         appContext.setMStatReporter(new TaskTrackerMStatReporter(appContext));
 
         appContext.setRemotingClient(remotingClient);
@@ -82,4 +85,10 @@ public class TaskTracker extends AbstractClientNode<TaskTrackerNode, TaskTracker
     public void setRunnerFactory(RunnerFactory factory) {
         appContext.setRunnerFactory(factory);
     }
+    
+    public void setPullRate(int rate) {
+    	Map<String, String> parameter = config.getParameters();
+    	parameter.put(ExtConfig.JOB_PULL_FREQUENCY, String.valueOf(rate));
+    }
+    
 }

@@ -1,19 +1,27 @@
 package com.github.ltsopensource.tasktracker.runner;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import com.github.ltsopensource.core.constant.EcTopic;
+import com.github.ltsopensource.core.constant.ExtConfig;
 import com.github.ltsopensource.core.domain.JobMeta;
 import com.github.ltsopensource.core.factory.NamedThreadFactory;
 import com.github.ltsopensource.core.logger.Logger;
 import com.github.ltsopensource.core.logger.LoggerFactory;
+import com.github.ltsopensource.core.registry.Registry;
 import com.github.ltsopensource.ec.EventInfo;
 import com.github.ltsopensource.ec.EventSubscriber;
 import com.github.ltsopensource.ec.Observer;
 import com.github.ltsopensource.tasktracker.domain.TaskTrackerAppContext;
 import com.github.ltsopensource.tasktracker.expcetion.NoAvailableJobRunnerException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
+import com.github.ltsopensource.zookeeper.DataListener;
 
 /**
  * @author Robert HG (254963746@qq.com) on 8/14/14.
@@ -50,12 +58,36 @@ public class RunnerPool {
     }
 
     private ThreadPoolExecutor initThreadPoolExecutor() {
-        int workThreads = appContext.getConfig().getWorkThreads();
-
-        return new ThreadPoolExecutor(workThreads, workThreads, 30, TimeUnit.SECONDS,
+    	
+        Registry registry = appContext.getRegistry();
+        
+        String path = registry.getAbsolutePath(appContext.getConfig(), ExtConfig.TASK_WORK_THREAD);
+        int workThreads = registry.getConfig(path, appContext.getConfig().getWorkThreads());
+        
+        final ThreadPoolExecutor executor = new ThreadPoolExecutor(workThreads, workThreads, 30, TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>(),           // 直接提交给线程而不保持它们
                 new NamedThreadFactory("JobRunnerPool"),
                 new ThreadPoolExecutor.AbortPolicy());
+        
+        registry.addListener(path, new DataListener() {
+			
+			@Override
+			public void dataDeleted(String dataPath) throws Exception {
+				// TODO Auto-generated method stub
+				executor.setCorePoolSize(appContext.getConfig().getWorkThreads());
+				executor.setMaximumPoolSize(appContext.getConfig().getWorkThreads());
+			}
+			
+			@Override
+			public void dataChange(String dataPath, Object data) throws Exception {
+				// TODO Auto-generated method stub
+				executor.setCorePoolSize((Integer)data);
+				executor.setMaximumPoolSize((Integer)data);
+			}
+		});
+        
+        return executor;
+        
     }
 
     public void execute(JobMeta jobMeta, RunnerCallback callback) throws NoAvailableJobRunnerException {

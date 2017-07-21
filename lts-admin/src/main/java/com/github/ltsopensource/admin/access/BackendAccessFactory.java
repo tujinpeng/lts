@@ -24,4 +24,7 @@ public interface BackendAccessFactory {
     BackendNodeOnOfflineLogAccess getBackendNodeOnOfflineLogAccess(Config config);
 
     BackendTaskTrackerMAccess getBackendTaskTrackerMAccess(Config config);
+    
+    BackendNodeConfigAccess getBackendNodeConfigAccess(Config config);
+    
 }

@@ -13,8 +13,9 @@ public class TestJobRunner implements JobRunner {
 
     @Override
     public Result run(JobContext jobContext) throws Throwable {
-        System.out.println(JSON.toJSONString(jobContext));
 
+    	Thread.currentThread().sleep(50);
+    	
         return new Result(Action.EXECUTE_SUCCESS);
     }
 }

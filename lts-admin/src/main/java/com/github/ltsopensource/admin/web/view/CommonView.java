@@ -4,11 +4,13 @@ import com.github.ltsopensource.admin.cluster.BackendAppContext;
 import com.github.ltsopensource.core.cluster.NodeType;
 import com.github.ltsopensource.core.commons.utils.DateUtils;
 import com.github.ltsopensource.queue.domain.NodeGroupPo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -118,6 +120,17 @@ public class CommonView {
         model.addAttribute("jobClientNodeGroups", jobClientNodeGroups);
         List<NodeGroupPo> taskTrackerNodeGroups = appContext.getNodeGroupStore().getNodeGroup(NodeType.TASK_TRACKER);
         model.addAttribute("taskTrackerNodeGroups", taskTrackerNodeGroups);
+    }
+    
+    
+    @RequestMapping("node-config-manager")
+    public String nodeConfigManager(Model model) {
+    	
+    	List<NodeGroupPo> taskTrackerNodeGroups = appContext.getNodeGroupStore().getNodeGroup(NodeType.TASK_TRACKER);
+        model.addAttribute("taskTrackerNodeGroups", taskTrackerNodeGroups);
+
+        return "nodeConfigManager";
+        
     }
 
 }

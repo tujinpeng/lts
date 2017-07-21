@@ -86,6 +86,7 @@ public abstract class AbstractJobNode<T extends Node, Context extends AppContext
                 LOGGER.info("========== Start success, nodeType={}, identity={}", config.getNodeType(), config.getIdentity());
             }
         } catch (Throwable e) {
+        	e.printStackTrace();
             if (e.getMessage().contains("Address already in use")) {
                 LOGGER.error("========== Start failed at listen port {}, nodeType={}, identity={}", config.getListenPort(), config.getNodeType(), config.getIdentity(), e);
             } else {
@@ -207,7 +208,7 @@ public abstract class AbstractJobNode<T extends Node, Context extends AppContext
     }
 
     private void initRegistry() {
-        registry = RegistryFactory.getRegistry(appContext);
+//        registry = RegistryFactory.getRegistry(appContext);
         if (registry instanceof AbstractRegistry) {
             ((AbstractRegistry) registry).setNode(node);
         }

@@ -1,5 +1,14 @@
 package com.github.ltsopensource.tasktracker.support;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.github.ltsopensource.core.AppContext;
 import com.github.ltsopensource.core.constant.Constants;
 import com.github.ltsopensource.core.constant.EcTopic;
 import com.github.ltsopensource.core.constant.ExtConfig;
@@ -9,6 +18,7 @@ import com.github.ltsopensource.core.logger.Logger;
 import com.github.ltsopensource.core.logger.LoggerFactory;
 import com.github.ltsopensource.core.protocol.JobProtos;
 import com.github.ltsopensource.core.protocol.command.JobPullRequest;
+import com.github.ltsopensource.core.registry.Registry;
 import com.github.ltsopensource.ec.EventInfo;
 import com.github.ltsopensource.ec.EventSubscriber;
 import com.github.ltsopensource.ec.Observer;
@@ -17,14 +27,7 @@ import com.github.ltsopensource.jvmmonitor.JVMMonitor;
 import com.github.ltsopensource.remoting.exception.RemotingCommandFieldCheckException;
 import com.github.ltsopensource.remoting.protocol.RemotingCommand;
 import com.github.ltsopensource.tasktracker.domain.TaskTrackerAppContext;
-
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.github.ltsopensource.zookeeper.DataListener;
 
 /**
  * 用来向JobTracker去取任务
@@ -39,7 +42,7 @@ public class JobPullMachine {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobPullMachine.class.getSimpleName());
 
     // 定时检查TaskTracker是否有空闲的线程，如果有，那么向JobTracker发起任务pull请求
-    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1, new NamedThreadFactory("LTS-JobPullMachine-Executor", true));
+    private ScheduledExecutorService executorService;
     private ScheduledFuture<?> scheduledFuture;
     private AtomicBoolean start = new AtomicBoolean(false);
     private TaskTrackerAppContext appContext;
@@ -90,7 +93,7 @@ public class JobPullMachine {
         try {
             if (start.compareAndSet(false, true)) {
                 if (scheduledFuture == null) {
-                    scheduledFuture = executorService.scheduleWithFixedDelay(worker, jobPullFrequency * 1000, jobPullFrequency * 1000, TimeUnit.MILLISECONDS);
+                	buildPullExecutor(appContext);
                 }
                 LOGGER.info("Start Job pull machine success!");
             }
@@ -193,6 +196,47 @@ public class JobPullMachine {
                 appContext.getConfig().setInternalData(Constants.MACHINE_RES_ENOUGH, enough);
             }
         }
+    }
+    
+    public void buildPullExecutor(AppContext context) {
+    	
+    	Registry registry = context.getRegistry();
+    	
+    	String path = registry.getAbsolutePath(context.getConfig(), ExtConfig.TASK_PULL_RATE);
+    	
+    	int pullFrequency = registry.getConfig(path, appContext.getConfig().getParameter(ExtConfig.JOB_PULL_FREQUENCY, Constants.DEFAULT_JOB_PULL_FREQUENCY));
+    	
+    	executorService = Executors.newScheduledThreadPool(1, new NamedThreadFactory("LTS-JobPullMachine-Executor", true));
+    	scheduledFuture = executorService.scheduleWithFixedDelay(worker, pullFrequency, pullFrequency, TimeUnit.MILLISECONDS);
+
+    	registry.addListener(path, new DataListener() {
+			
+			@Override
+			public void dataDeleted(String dataPath) throws Exception {
+				// TODO Auto-generated method stub
+				restartPullExecutor(appContext.getConfig().getParameter(ExtConfig.JOB_PULL_FREQUENCY, Constants.DEFAULT_JOB_PULL_FREQUENCY));
+			}
+			
+			@Override
+			public void dataChange(String dataPath, Object data) throws Exception {
+				// TODO Auto-generated method stub
+				restartPullExecutor((Integer) data);
+			}
+		});
+    	
+    }
+    
+    public void restartPullExecutor(int delay) {
+    	
+    	try {
+			executorService.shutdown();
+			executorService.awaitTermination(1, TimeUnit.MINUTES);
+			executorService = Executors.newScheduledThreadPool(1, new NamedThreadFactory("LTS-JobPullMachine-Executor", true));
+			scheduledFuture = executorService.scheduleWithFixedDelay(worker, delay, delay, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			LOGGER.error("restartPullExecutor fail", e);
+		}
     }
 
 }

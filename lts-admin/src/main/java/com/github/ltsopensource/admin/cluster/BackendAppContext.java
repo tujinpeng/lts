@@ -36,6 +36,8 @@ public class BackendAppContext extends AppContext {
     private NoRelyJobGenerator noRelyJobGenerator;
 
     private BackendRegistrySrv backendRegistrySrv;
+    
+    private BackendNodeConfigAccess backendNodeConfigAccess;
 
     public Node getNode() {
         return node;
@@ -188,4 +190,13 @@ public class BackendAppContext extends AppContext {
     public void setBackendRegistrySrv(BackendRegistrySrv backendRegistrySrv) {
         this.backendRegistrySrv = backendRegistrySrv;
     }
+
+	public BackendNodeConfigAccess getBackendNodeConfigAccess() {
+		return backendNodeConfigAccess;
+	}
+
+	public void setBackendNodeConfigAccess(
+			BackendNodeConfigAccess backendNodeConfigAccess) {
+		this.backendNodeConfigAccess = backendNodeConfigAccess;
+	}
 }

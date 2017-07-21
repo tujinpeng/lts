@@ -103,4 +103,9 @@ public class BackendRegistrySrv {
 
         subscribe();
     }
+
+	public Registry getRegistry() {
+		return registry;
+	}
+    
 }

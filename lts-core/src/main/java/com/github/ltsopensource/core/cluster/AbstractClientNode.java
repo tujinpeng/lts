@@ -4,6 +4,7 @@ import com.github.ltsopensource.core.AppContext;
 import com.github.ltsopensource.core.constant.Constants;
 import com.github.ltsopensource.core.constant.ExtConfig;
 import com.github.ltsopensource.core.factory.NamedThreadFactory;
+import com.github.ltsopensource.core.registry.RegistryFactory;
 import com.github.ltsopensource.core.remoting.HeartBeatMonitor;
 import com.github.ltsopensource.core.remoting.RemotingClientDelegate;
 import com.github.ltsopensource.core.spi.ServiceLoader;
@@ -12,6 +13,7 @@ import com.github.ltsopensource.remoting.RemotingClientConfig;
 import com.github.ltsopensource.remoting.RemotingProcessor;
 import com.github.ltsopensource.remoting.RemotingTransporter;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -40,7 +42,7 @@ public abstract class AbstractClientNode<T extends Node, Context extends AppCont
      * 得到默认的处理器
      */
     protected abstract RemotingProcessor getDefaultProcessor();
-
+    
     protected void remotingStop() {
         heartBeatMonitor.stop();
         remotingClient.shutdown();
@@ -62,6 +64,9 @@ public abstract class AbstractClientNode<T extends Node, Context extends AppCont
         //
         this.remotingClient = new RemotingClientDelegate(getRemotingClient(new RemotingClientConfig()), appContext);
         this.heartBeatMonitor = new HeartBeatMonitor(remotingClient, appContext);
+        
+        registry = RegistryFactory.getRegistry(appContext);
+        appContext.setRegistry(registry);
 
         beforeStart();
     }

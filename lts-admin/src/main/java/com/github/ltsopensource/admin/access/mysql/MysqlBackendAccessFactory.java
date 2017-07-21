@@ -42,4 +42,11 @@ public class MysqlBackendAccessFactory implements BackendAccessFactory {
     public BackendTaskTrackerMAccess getBackendTaskTrackerMAccess(Config config) {
         return new MysqlBackendTaskTrackerMAccess(config);
     }
+    
+    @Override
+    public BackendNodeConfigAccess getBackendNodeConfigAccess(Config config) {
+    	// TODO Auto-generated method stub
+    	return new MysqlBackendNodeConfigAccess(config);
+    }
+    
 }

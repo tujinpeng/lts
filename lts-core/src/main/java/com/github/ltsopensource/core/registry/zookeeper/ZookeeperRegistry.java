@@ -10,12 +10,15 @@ import com.github.ltsopensource.core.registry.NotifyEvent;
 import com.github.ltsopensource.core.registry.NotifyListener;
 import com.github.ltsopensource.core.spi.ServiceLoader;
 import com.github.ltsopensource.zookeeper.ChildListener;
+import com.github.ltsopensource.zookeeper.DataListener;
 import com.github.ltsopensource.zookeeper.StateListener;
 import com.github.ltsopensource.zookeeper.ZkClient;
 import com.github.ltsopensource.zookeeper.ZookeeperTransporter;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -32,6 +35,8 @@ public class ZookeeperRegistry extends FailbackRegistry {
     private final ConcurrentMap<Node, ConcurrentMap<NotifyListener, ChildListener>> zkListeners;
 
     private String clusterName;
+    
+	private Map<String, DataListener> zkConfigListeners = new ConcurrentHashMap<String, DataListener>();
 
     public ZookeeperRegistry(final AppContext appContext) {
         super(appContext);
@@ -55,6 +60,7 @@ public class ZookeeperRegistry extends FailbackRegistry {
                     try {
                         appContext.getRegistryStatMonitor().setAvailable(true);
                         recover();
+                        recoverConfigListener();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
                     }
@@ -180,5 +186,75 @@ public class ZookeeperRegistry extends FailbackRegistry {
             LOGGER.warn("Failed to close zookeeper client " + getNode() + ", cause: " + e.getMessage(), e);
         }
     }
+    
+	public <T> T getConfig(String key, T defaultVal) {
+		
+		try {
+			if(!zkClient.exists(key)) {
+				zkClient.create(key, false, false);
+			} else {
+				T value = zkClient.getData(key);
+				if(value!=null) {
+					return value;
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			LOGGER.error("Fail to getConfig From zookeeper:"+key, e);
+		}
+	
+		return defaultVal;
+
+	}
+
+	@Override
+	public void addConfig(String key, Object value) {
+		if(zkClient.exists(key)) {
+			zkClient.setData(key, value);
+		} else {
+			if(zkClient.create(key, value, false, false)==null) {
+				zkClient.setData(key, value);
+			}		
+		}
+	}
+
+	@Override
+	public void deleteConfig(String key) {
+		zkClient.delete(key);
+	}
+
+	@Override
+	public void updateConfig(String key, Object newVal) {
+		zkClient.setData(key, newVal);
+	}
+	
+	@Override
+	public boolean existConfig(String key) {
+		return zkClient.exists(key);
+	}
+	
+	public void addListener(String path, DataListener listener) {
+		try {
+			zkConfigListeners.put(path, listener);
+			zkClient.addDataListener(path, listener);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			LOGGER.error("Fail to listen "+path, e);
+		}
+	}
+	
+	public void recoverConfigListener() {
+		
+		for(Iterator<String> iter = zkConfigListeners.keySet().iterator(); iter.hasNext();) {
+			
+			String path = iter.next();
+			DataListener listener = zkConfigListeners.get(path);
+			if(listener!=null) {
+				zkClient.addDataListener(path, listener);
+			}
+			
+		}
+	}
+    
 }
 

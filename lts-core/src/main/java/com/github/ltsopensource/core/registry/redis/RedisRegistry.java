@@ -16,6 +16,8 @@ import com.github.ltsopensource.core.registry.NodeRegistryUtils;
 import com.github.ltsopensource.core.registry.NotifyEvent;
 import com.github.ltsopensource.core.registry.NotifyListener;
 import com.github.ltsopensource.core.support.SystemClock;
+import com.github.ltsopensource.zookeeper.DataListener;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -433,5 +435,38 @@ public class RedisRegistry extends FailbackRegistry {
             }
         }
     }
+    
+	@Override
+	public <T> T getConfig(String key, T defaultVal) {
+		// TODO Auto-generated method stub
+		return defaultVal;
+	}
+
+	@Override
+	public void addListener(String path, DataListener listener) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void addConfig(String key, Object value) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void deleteConfig(String key) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void updateConfig(String key, Object newVal) {
+		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public boolean existConfig(String key) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 
 }

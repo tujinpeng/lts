@@ -1,6 +1,7 @@
 package com.github.ltsopensource.admin.access;
 
 import com.github.ltsopensource.admin.access.domain.NodeOnOfflineLog;
+import com.github.ltsopensource.admin.request.NodeConfig;
 import com.github.ltsopensource.admin.web.vo.NodeInfo;
 import com.github.ltsopensource.core.cluster.Node;
 import com.github.ltsopensource.core.cluster.NodeType;
@@ -246,4 +247,28 @@ public class RshHandler {
             return list;
         }
     };
+    
+    public static final ResultSetHandler<List<NodeConfig>> NODE_CONFIG_RSH = new ResultSetHandler<List<NodeConfig>>() {
+        @Override
+        public List<NodeConfig> handle(ResultSet rs) throws SQLException {
+          
+        	List<NodeConfig> list = new ArrayList<NodeConfig>();
+
+            while (rs.next()) {
+             
+                NodeConfig config = new NodeConfig();
+                config.setId(rs.getInt("id"));
+                config.setConfigName(rs.getString("config_name"));
+                config.setConfigValue(rs.getString("config_value"));
+                config.setNodeType(rs.getString("node_type"));
+                config.setNodeGroup(rs.getString("node_group"));
+                config.setRemark(rs.getString("remark"));
+                
+                list.add(config);
+            }
+            return list;
+        }
+    };
+    
+    
 }

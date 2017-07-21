@@ -1,16 +1,25 @@
 package com.github.ltsopensource.jobtracker.support;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import com.github.ltsopensource.core.AppContext;
 import com.github.ltsopensource.core.commons.utils.Holder;
-import com.github.ltsopensource.core.json.JSON;
 import com.github.ltsopensource.core.constant.Constants;
+import com.github.ltsopensource.core.constant.ExtConfig;
 import com.github.ltsopensource.core.exception.RemotingSendException;
 import com.github.ltsopensource.core.exception.RequestTimeoutException;
 import com.github.ltsopensource.core.factory.NamedThreadFactory;
+import com.github.ltsopensource.core.json.JSON;
 import com.github.ltsopensource.core.logger.Logger;
 import com.github.ltsopensource.core.logger.LoggerFactory;
 import com.github.ltsopensource.core.protocol.JobProtos;
 import com.github.ltsopensource.core.protocol.command.JobPullRequest;
 import com.github.ltsopensource.core.protocol.command.JobPushRequest;
+import com.github.ltsopensource.core.registry.Registry;
 import com.github.ltsopensource.core.remoting.RemotingServerDelegate;
 import com.github.ltsopensource.core.support.JobDomainConverter;
 import com.github.ltsopensource.core.support.SystemClock;
@@ -20,15 +29,11 @@ import com.github.ltsopensource.jobtracker.monitor.JobTrackerMStatReporter;
 import com.github.ltsopensource.jobtracker.sender.JobPushResult;
 import com.github.ltsopensource.jobtracker.sender.JobSender;
 import com.github.ltsopensource.queue.domain.JobPo;
-import com.github.ltsopensource.store.jdbc.exception.DupEntryException;
 import com.github.ltsopensource.remoting.AsyncCallback;
 import com.github.ltsopensource.remoting.ResponseFuture;
 import com.github.ltsopensource.remoting.protocol.RemotingCommand;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import com.github.ltsopensource.store.jdbc.exception.DupEntryException;
+import com.github.ltsopensource.zookeeper.DataListener;
 
 /**
  * @author Robert HG (254963746@qq.com) on 8/18/14.
@@ -44,14 +49,13 @@ public class JobPusher {
 
     public JobPusher(JobTrackerAppContext appContext) {
         this.appContext = appContext;
-        this.executorService = Executors.newFixedThreadPool(Constants.AVAILABLE_PROCESSOR * 5,
-                new NamedThreadFactory(JobPusher.class.getSimpleName(), true));
+        this.executorService = getPushExecutor(appContext);
         this.stat = (JobTrackerMStatReporter) appContext.getMStatReporter();
         this.remotingServer = appContext.getRemotingServer();
     }
 
     public void concurrentPush(final JobPullRequest request) {
-
+    	
         this.executorService.submit(new Runnable() {
             @Override
             public void run() {
@@ -193,5 +197,35 @@ public class JobPusher {
         });
 
         return (JobPushResult) sendResult.getReturnValue();
+    }
+    
+    public ExecutorService getPushExecutor(AppContext appContext) {
+    	
+    	Registry registry = appContext.getRegistry();
+    	String path = registry.getAbsolutePath(appContext.getConfig(), ExtConfig.PUSH_THREAD);
+    	final int pushExecutorSize = registry.getConfig(path, Constants.AVAILABLE_PROCESSOR * 5);
+    	
+    	final ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(pushExecutorSize,
+                new NamedThreadFactory(JobPusher.class.getSimpleName(), true));
+    	
+    	registry.addListener(path, new DataListener() {
+			
+			@Override
+			public void dataDeleted(String dataPath) throws Exception {
+				// TODO Auto-generated method stub
+				executorService.setCorePoolSize(Constants.AVAILABLE_PROCESSOR * 5);
+				executorService.setMaximumPoolSize(Constants.AVAILABLE_PROCESSOR * 5);
+			}
+			
+			@Override
+			public void dataChange(String dataPath, Object data) throws Exception {
+				// TODO Auto-generated method stub
+				executorService.setCorePoolSize((Integer)data);
+				executorService.setMaximumPoolSize((Integer)data);
+			}
+		});
+    	
+    	return executorService;
+    	
     }
 }

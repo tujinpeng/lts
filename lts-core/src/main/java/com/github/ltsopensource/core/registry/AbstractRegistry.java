@@ -1,11 +1,15 @@
 package com.github.ltsopensource.core.registry;
 
 import com.github.ltsopensource.core.AppContext;
+import com.github.ltsopensource.core.cluster.Config;
 import com.github.ltsopensource.core.cluster.Node;
+import com.github.ltsopensource.core.cluster.NodeType;
 import com.github.ltsopensource.core.commons.concurrent.ConcurrentHashSet;
 import com.github.ltsopensource.core.commons.utils.CollectionUtils;
+import com.github.ltsopensource.core.commons.utils.StringUtils;
 import com.github.ltsopensource.core.logger.Logger;
 import com.github.ltsopensource.core.logger.LoggerFactory;
+import com.github.ltsopensource.zookeeper.DataListener;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -184,5 +188,24 @@ public abstract class AbstractRegistry implements Registry {
             }
         }
     }
+
+	@Override
+	public String getAbsolutePath(Config config, String path) {
+		// TODO Auto-generated method stub
+		
+		String absolutePath = "/LTS/config/" + config.getClusterName() + "/" + config.getNodeType();
+    	
+		if(NodeType.TASK_TRACKER.equals(config.getNodeType())) {
+    		absolutePath+= "/"+config.getNodeGroup();
+    	}
+		
+		if(path!=null) {
+			absolutePath+= "/"+ path;
+		}
+    	
+    	return absolutePath;
+	}
+    
+    
 
 }
