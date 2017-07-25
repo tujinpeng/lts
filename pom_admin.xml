@@ -8,6 +8,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
+        <module>lts-core</module>
         <module>lts-admin</module>
         <module>lts-monitor</module>
     </modules>
