@@ -8,7 +8,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>lts-parent</module>
+        <module>lts-pombase</module>
         <module>lts-core</module>
         <module>lts-admin</module>
         <module>lts-monitor</module>
