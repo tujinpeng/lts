@@ -1,8 +1,7 @@
 
-
 *.class
 *.iml
-
+*.jar
 
 # ide files #
 .classpath
