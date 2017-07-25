@@ -215,6 +215,7 @@ public class JobPusher {
 				// TODO Auto-generated method stub
 				executorService.setCorePoolSize(Constants.AVAILABLE_PROCESSOR * 5);
 				executorService.setMaximumPoolSize(Constants.AVAILABLE_PROCESSOR * 5);
+				LOGGER.info("参数调整"+ExtConfig.PUSH_THREAD+"="+Constants.AVAILABLE_PROCESSOR * 5);
 			}
 			
 			@Override
@@ -222,6 +223,7 @@ public class JobPusher {
 				// TODO Auto-generated method stub
 				executorService.setCorePoolSize((Integer)data);
 				executorService.setMaximumPoolSize((Integer)data);
+				LOGGER.info("参数调整"+ExtConfig.PUSH_THREAD+"="+data);
 			}
 		});
     	

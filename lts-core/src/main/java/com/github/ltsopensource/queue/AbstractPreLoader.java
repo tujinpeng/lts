@@ -178,12 +178,14 @@ public abstract class AbstractPreLoader implements PreLoader {
 			public void dataDeleted(String dataPath) throws Exception {
 				// TODO Auto-generated method stub
 				loadSize = appContext.getConfig().getParameter(ExtConfig.JOB_TRACKER_PRELOADER_SIZE, 300);
+				logger.info("参数调整"+ExtConfig.PRELOADER_LAOD_SIZE+"="+loadSize);
 			}
 			
 			@Override
 			public void dataChange(String dataPath, Object data) throws Exception {
 				// TODO Auto-generated method stub
 				loadSize = (int) data;
+				logger.info("参数调整"+ExtConfig.PRELOADER_LAOD_SIZE+"="+loadSize);
 			}
 		});
         
@@ -195,12 +197,14 @@ public abstract class AbstractPreLoader implements PreLoader {
 			public void dataDeleted(String dataPath) throws Exception {
 				// TODO Auto-generated method stub
 				factor = appContext.getConfig().getParameter(ExtConfig.JOB_TRACKER_PRELOADER_FACTOR, 0.2);
+				logger.info("参数调整"+ExtConfig.PRELOADER_LAOD_FACTOR+"="+factor);
 			}
 			
 			@Override
 			public void dataChange(String dataPath, Object data) throws Exception {
 				// TODO Auto-generated method stub
 				factor = (double) data; 
+				logger.info("参数调整"+ExtConfig.PRELOADER_LAOD_FACTOR+"="+factor);
 			}
 		});
         
@@ -232,9 +236,10 @@ public abstract class AbstractPreLoader implements PreLoader {
 			LOAD_EXECUTOR_SERVICE.awaitTermination(60, TimeUnit.MILLISECONDS);
 			LOAD_EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("LTS-PreLoader", true));
 			scheduledFuture = LOAD_EXECUTOR_SERVICE.scheduleWithFixedDelay(new PreloaderRunner(), delay, delay, TimeUnit.MILLISECONDS);
+			logger.info("PreLoader重启成功==>delay="+delay);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			logger.error("restartLoadService Fail", e);
+			logger.error("PreLoader重启失败", e);
 		}
     }
  	

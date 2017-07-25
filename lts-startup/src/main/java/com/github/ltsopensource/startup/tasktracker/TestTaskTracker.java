@@ -17,7 +17,7 @@ public class TestTaskTracker {
 //		taskTracker.setPullRate(Integer.parseInt(args[1]));
 //		System.out.println("pull rate:"+args[1]);
 		taskTracker.setWorkThreads(30);
-		taskTracker.setPullRate(1000);
+//		taskTracker.setPullRate(1000);
 		taskTracker.start();
 		
 		

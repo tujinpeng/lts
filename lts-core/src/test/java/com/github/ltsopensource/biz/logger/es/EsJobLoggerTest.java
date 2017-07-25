@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.ltsopensource.admin.response.PaginationRsp;
 import com.github.ltsopensource.biz.logger.domain.JobLogPo;
 import com.github.ltsopensource.biz.logger.domain.JobLoggerRequest;
+import com.github.ltsopensource.core.cluster.Config;
 import com.github.ltsopensource.json.JSONObject;
 
 public class EsJobLoggerTest {
@@ -29,7 +30,9 @@ public class EsJobLoggerTest {
 
 	@BeforeClass
 	public static void init() {
-		logger = new EsJobLogger(null);
+		Config config = new Config();
+		config.getParameters().put("es.log.url", "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService");
+		logger = new EsJobLogger(config);
 	}
 	
 	@Test
@@ -93,11 +96,13 @@ public class EsJobLoggerTest {
 	@Test
 	public void testQuery() {
 		
-		EsJobLogger logger = new EsJobLogger(null);
+		Config config = new Config();
+		config.getParameters().put("es.log.url", "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService");
+		logger = new EsJobLogger(config);
 		JobLoggerRequest request = new JobLoggerRequest();
 		request.setStart(0);
 		request.setLimit(10);
-		request.setRealTaskId("991000014512");
+		request.setRealTaskId("sss991000014512");
 		
 		PaginationRsp<JobLogPo> result = logger.search(request);
 		System.out.println(JSON.toJSON(result));

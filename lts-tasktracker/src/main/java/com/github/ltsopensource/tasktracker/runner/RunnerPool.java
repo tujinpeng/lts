@@ -76,6 +76,7 @@ public class RunnerPool {
 				// TODO Auto-generated method stub
 				executor.setCorePoolSize(appContext.getConfig().getWorkThreads());
 				executor.setMaximumPoolSize(appContext.getConfig().getWorkThreads());
+				LOGGER.info("参数调整"+ExtConfig.TASK_WORK_THREAD+"="+appContext.getConfig().getWorkThreads());
 			}
 			
 			@Override
@@ -83,6 +84,7 @@ public class RunnerPool {
 				// TODO Auto-generated method stub
 				executor.setCorePoolSize((Integer)data);
 				executor.setMaximumPoolSize((Integer)data);
+				LOGGER.info("参数调整"+ExtConfig.TASK_WORK_THREAD+"="+data);
 			}
 		});
         

@@ -233,9 +233,10 @@ public class JobPullMachine {
 			executorService.awaitTermination(1, TimeUnit.MINUTES);
 			executorService = Executors.newScheduledThreadPool(1, new NamedThreadFactory("LTS-JobPullMachine-Executor", true));
 			scheduledFuture = executorService.scheduleWithFixedDelay(worker, delay, delay, TimeUnit.MILLISECONDS);
+			LOGGER.info("PullExecutor重启成功==>delay="+delay);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			LOGGER.error("restartPullExecutor fail", e);
+			LOGGER.error("PullExecutor重启失败", e);
 		}
     }
 

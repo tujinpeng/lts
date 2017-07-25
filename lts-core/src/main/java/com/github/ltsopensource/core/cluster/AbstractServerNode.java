@@ -113,6 +113,7 @@ public abstract class AbstractServerNode<T extends Node, App extends AppContext>
 				int processorSize = config.getParameter(ExtConfig.PROCESSOR_THREAD, Constants.DEFAULT_PROCESSOR_THREAD);
 				executor.setCorePoolSize(processorSize);
 				executor.setMaximumPoolSize(processorSize);
+				LOGGER.info("参数调整"+ExtConfig.PROCESSOR_THREAD+"="+processorSize);
 			}
 			
 			@Override
@@ -120,6 +121,7 @@ public abstract class AbstractServerNode<T extends Node, App extends AppContext>
 				// TODO Auto-generated method stub
 				executor.setCorePoolSize((int)data);
 				executor.setMaximumPoolSize((int)data);
+				LOGGER.info("参数调整"+ExtConfig.PROCESSOR_THREAD+"="+data);
 			}
 		});
         
