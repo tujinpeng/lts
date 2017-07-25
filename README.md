@@ -2,6 +2,7 @@
 
 LTS(light-task-scheduler)主要用于解决分布式任务调度问题，支持实时任务，定时任务和Cron任务。有较好的伸缩性，扩展性，健壮稳定性而被多家公司使用，同时也希望开源爱好者一起贡献。
 
+
 ## 项目地址
 oschina地址:
 [http://git.oschina.net/hugui/light-task-scheduler](http://git.oschina.net/hugui/light-task-scheduler)
@@ -13,7 +14,6 @@ oschina地址:
 [https://www.gitbook.com/book/qq254963746/lts/details](https://www.gitbook.com/book/qq254963746/lts/details)
 
 这两个地址都会同步更新。感兴趣，请加QQ群：109500214 一起探讨、完善。越多人支持，就越有动力去更新，喜欢记得右上角star哈。
-
 ## 1.6.9-SNAPSHOT(master)变更主要点
 #### 1. 取任务优先级,按任务设置的priority优先,再按triggerTime优先, 数据库的索引也会变
 #### 2. lts_executable_job_queue_ (前缀)表名改为 lts_wjq_ (前缀), 缩短表名

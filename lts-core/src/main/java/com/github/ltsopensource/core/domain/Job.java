@@ -228,5 +228,10 @@ public class Job implements Serializable {
         if (repeatCount < -1) {
             throw new JobSubmitException("repeatCount invalid, must be great than -1! job is " + toString());
         }
+        if (extParams != null){
+            if(extParams.toString().length() >50000) {
+                throw new JobSubmitException("extParams length should not great than 50000!");
+            }
+        }
     }
 }
