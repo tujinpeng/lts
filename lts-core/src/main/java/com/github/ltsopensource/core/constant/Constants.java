@@ -52,7 +52,7 @@ public interface Constants {
 
     int DEFAULT_JOB_MAX_RETRY_TIMES = 10;
 
-    int DEFAULT_JOB_PULL_FREQUENCY = 1;
+    int DEFAULT_JOB_PULL_FREQUENCY = 1000;
 
     // TaskTracker 离线(网络隔离)时间 10s，超过10s，自动停止当前执行任务
     long DEFAULT_TASK_TRACKER_OFFLINE_LIMIT_MILLIS = 10 * 1000;
