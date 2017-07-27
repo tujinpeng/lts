@@ -47,14 +47,11 @@ public class JobPullMachine {
     private AtomicBoolean start = new AtomicBoolean(false);
     private TaskTrackerAppContext appContext;
     private Runnable worker;
-    private int jobPullFrequency;
     // 是否启用机器资源检查
     private boolean machineResCheckEnable = false;
 
     public JobPullMachine(final TaskTrackerAppContext appContext) {
         this.appContext = appContext;
-        this.jobPullFrequency = appContext.getConfig().getParameter(ExtConfig.JOB_PULL_FREQUENCY, Constants.DEFAULT_JOB_PULL_FREQUENCY);
-
         this.machineResCheckEnable = appContext.getConfig().getParameter(ExtConfig.LB_MACHINE_RES_CHECK_ENABLE, false);
 
         appContext.getEventCenter().subscribe(
@@ -161,10 +158,10 @@ public class JobPullMachine {
 
         try {
             // 1. Cpu usage
-            Double maxCpuTimeRate = appContext.getConfig().getParameter(ExtConfig.LB_CPU_USED_RATE_MAX, 90d);
+            Double maxCpuTimeRate = appContext.getConfig().getParameter(ExtConfig.LB_CPU_USED_RATE_MAX, 0.8);
             Object processCpuTimeRate = JVMMonitor.getAttribute(JVMConstants.JMX_JVM_THREAD_NAME, "ProcessCpuTimeRate");
             if (processCpuTimeRate != null) {
-                Double cpuRate = Double.valueOf(processCpuTimeRate.toString()) / (Constants.AVAILABLE_PROCESSOR * 1.0);
+                Double cpuRate = Double.valueOf(processCpuTimeRate.toString());
                 if (cpuRate >= maxCpuTimeRate) {
                     LOGGER.info("Pause Pull, CPU USAGE is " + String.format("%.2f", cpuRate) + "% >= " + String.format("%.2f", maxCpuTimeRate) + "%");
                     enough = false;
@@ -173,7 +170,7 @@ public class JobPullMachine {
             }
 
             // 2. Memory usage
-            Double maxMemoryUsedRate = appContext.getConfig().getParameter(ExtConfig.LB_MEMORY_USED_RATE_MAX, 90d);
+            Double maxMemoryUsedRate = appContext.getConfig().getParameter(ExtConfig.LB_MEMORY_USED_RATE_MAX, 0.9);
             Runtime runtime = Runtime.getRuntime();
             long maxMemory = runtime.maxMemory();
             long usedMemory = runtime.totalMemory() - runtime.freeMemory();
@@ -226,6 +223,10 @@ public class JobPullMachine {
     	
     }
     
+    /**
+     * 重启任务拉取器 串行 线程安全
+     * @param delay
+     */
     public void restartPullExecutor(int delay) {
     	
     	try {
