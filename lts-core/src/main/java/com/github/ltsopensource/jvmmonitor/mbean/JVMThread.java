@@ -59,7 +59,7 @@ public class JVMThread implements JVMThreadMBean {
             return new BigDecimal(0);
         }
 
-        float cpuUsage = elapsedCpu / (elapsedTime * 10000F);
+        float cpuUsage = elapsedCpu / (elapsedTime * 1000000F * OperatingSystem.getAvailableProcessors());
         cpuRate = new BigDecimal(cpuUsage, new MathContext(4));
 
         return cpuRate;
