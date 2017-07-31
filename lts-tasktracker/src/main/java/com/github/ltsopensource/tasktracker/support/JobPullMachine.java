@@ -158,7 +158,7 @@ public class JobPullMachine {
 
         try {
             // 1. Cpu usage
-            Double maxCpuTimeRate = appContext.getConfig().getParameter(ExtConfig.LB_CPU_USED_RATE_MAX, 0.8);
+            Double maxCpuTimeRate = appContext.getConfig().getParameter(ExtConfig.LB_CPU_USED_RATE_MAX, 90d);
             Object processCpuTimeRate = JVMMonitor.getAttribute(JVMConstants.JMX_JVM_THREAD_NAME, "ProcessCpuTimeRate");
             if (processCpuTimeRate != null) {
                 Double cpuRate = Double.valueOf(processCpuTimeRate.toString());
