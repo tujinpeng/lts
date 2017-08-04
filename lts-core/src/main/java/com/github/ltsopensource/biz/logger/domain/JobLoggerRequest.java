@@ -1,6 +1,8 @@
 package com.github.ltsopensource.biz.logger.domain;
 
 import com.github.ltsopensource.admin.request.PaginationReq;
+import com.github.ltsopensource.biz.logger.es.annotation.EsLogFilter;
+import com.github.ltsopensource.biz.logger.es.annotation.EsLogFilter.Optype;
 
 import java.util.Date;
 
@@ -9,28 +11,39 @@ import java.util.Date;
  */
 public class JobLoggerRequest extends PaginationReq {
 
+	@EsLogFilter(name = "realTaskId")
     private String realTaskId;
     private String taskId;
 
+    @EsLogFilter(name = "taskTrackerNodeGroup")
     private String taskTrackerNodeGroup;
     
-    
+    @EsLogFilter(name = "bizId")
     private String bizId;
     
+    @EsLogFilter(name = "eventType")
     private String eventType;
 
     private Date startLogTime;
+
+    @EsLogFilter(name = "logTime", opType = Optype.Range, extra = "gte")
     private Long startLogTimeMill;
 
     private Date endLogTime;
+    
+    @EsLogFilter(name = "logTime", opType = Optype.Range, extra = "lte")
     private Long endLogTimeMill;
 
+    @EsLogFilter(name = "submitNodeGroup")
     private String submitNodeGroup;//提交节点组
     
+    @EsLogFilter(name = "logType")
     private String logType; // 日志类型
     
+    @EsLogFilter(name = "jobType")
     private String jobType;//类型
     
+    @EsLogFilter(name = "success")
     private String success;//执行结果
     
     public String getRealTaskId() {
