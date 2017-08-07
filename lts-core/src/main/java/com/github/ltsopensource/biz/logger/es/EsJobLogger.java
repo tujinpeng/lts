@@ -9,7 +9,6 @@ import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -211,13 +210,7 @@ public class EsJobLogger implements JobLogger
     public PaginationRsp<JobLogPo> search(JobLoggerRequest request) {
 		
         PaginationRsp<JobLogPo> response = new PaginationRsp<JobLogPo>();
-        
-    	//eg:第一页(0,10)传送0，第二页(10,10)传送1....
-    	Integer pageNum = request.getStart();
-    	if(pageNum!=0){
-    		pageNum = request.getStart()/request.getLimit();
-    	}
-    	
+    
     	if(null!=request.getStartLogTime()){
     		request.setStartLogTimeMill(request.getStartLogTime().getTime());
     	}
@@ -244,7 +237,7 @@ public class EsJobLogger implements JobLogger
     		}
     		
     		JSONObject search = new JSONObject();
-    		search.put("from", pageNum);
+    		search.put("from", request.getStart());
     		search.put("size", request.getLimit());
     		
         	if(must.size() > 0) {
@@ -275,7 +268,7 @@ public class EsJobLogger implements JobLogger
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			logger.info("查询第"+pageNum+"页日志失败", e);
+			logger.info("日志查询失败", e);
 		}
     
 		return response;

@@ -1,0 +1,35 @@
+#创建tnt_lts索引
+curl -XPUT 192.168.0.105:9200/tnt_lts
+
+#创建log映射
+curl -XPOST  192.168.0.105:9200/tnt_lts/_mapping/log -d '
+{
+    "log":{
+        "dynamic_templates":[
+            {
+                "string":{
+                    "match_mapping_type":"string",
+                    "mapping":{
+                        "index":"not_analyzed"
+                    }
+                }
+            },
+            {
+                "extParams":{
+                    "path_match":"extParams.*",
+                    "mapping":{
+                        "index":"no"
+                    }
+                }
+            },
+            {
+                "internalExtParams":{
+                    "path_match":"internalExtParams.*",
+                    "mapping":{
+                        "index":"no"
+                    }
+                }
+            }
+        ]
+    }
+}'
