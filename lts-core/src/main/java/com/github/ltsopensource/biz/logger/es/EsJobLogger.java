@@ -1,38 +1,36 @@
 package com.github.ltsopensource.biz.logger.es;
 
 import java.io.IOException;
-import java.net.URLEncoder;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Random;
 import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
-import com.alibaba.druid.util.StringUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.ltsopensource.admin.response.PaginationRsp;
 import com.github.ltsopensource.biz.logger.JobLogger;
 import com.github.ltsopensource.biz.logger.domain.JobLogPo;
 import com.github.ltsopensource.biz.logger.domain.JobLoggerRequest;
+import com.github.ltsopensource.biz.logger.es.annotation.EsLogFilter;
+import com.github.ltsopensource.biz.logger.es.annotation.EsLogFilter.Optype;
 import com.github.ltsopensource.biz.logger.es.util.EsFailCntClearTimer;
 import com.github.ltsopensource.biz.logger.es.util.HttpClientFactory;
 import com.github.ltsopensource.biz.logger.es.util.ThreadPoolFactory;
 import com.github.ltsopensource.core.cluster.Config;
 import com.github.ltsopensource.core.commons.utils.CollectionUtils;
+import com.github.ltsopensource.core.commons.utils.StringUtils;
 import com.github.ltsopensource.core.logger.Logger;
 import com.github.ltsopensource.core.logger.LoggerFactory;
 
@@ -48,6 +46,28 @@ public class EsJobLogger implements JobLogger
 	private volatile boolean isShutDown;
 	
 	private Timer timer;
+	
+	private final String Delimiters = "\n";
+	
+	private enum EsOpType {
+		
+		SAVE(""),
+		BULKSAVE("_bulk"),
+		COUNT("_count"),
+		SEARCH("_search"),
+		INDEX("index");
+		
+		private String value;
+		
+		private EsOpType(String value) {
+			this.value = value;
+		}
+		
+		public String getValue() {
+			return value;
+		}
+		
+	}
 	
 	public EsJobLogger(Config config) {
 		
@@ -71,7 +91,7 @@ public class EsJobLogger implements JobLogger
         	jobLogPo.setEventType(jobLogPo.getExtParams().get("eventType"));
         }
         
-        submitAsync("saveOne", toJsonString(jobLogPo));
+        submitAsync(EsOpType.SAVE.getValue(), JSON.toJSONString(jobLogPo));
     
 	}
     
@@ -82,15 +102,27 @@ public class EsJobLogger implements JobLogger
             return;
         }
     	
+    	StringBuilder builder = new StringBuilder();
+        JSONObject create = new JSONObject();
+        create.put(EsOpType.INDEX.getValue(), new JSONObject());
+        
         for(JobLogPo jp: jobLogPos){
+        	
+        	builder.append(JSON.toJSONString(create));
+        	
         	if(jp.getExtParams()!=null){
         		jp.setBizId(jp.getExtParams().get("bizId"));
         		jp.setBizType(jp.getExtParams().get("bizType"));
         		jp.setEventType(jp.getExtParams().get("eventType"));
         	}
+        	
+        	builder.append(Delimiters);
+        	builder.append(JSON.toJSONString(jp));
+        	builder.append(Delimiters);
         }
         
-        submitAsync("saveAll", toJsonString(jobLogPos));
+        
+        submitAsync(EsOpType.BULKSAVE.getValue(), builder.toString());
     
     }
     
@@ -140,30 +172,22 @@ public class EsJobLogger implements JobLogger
 	public String submitSync(String service, String content) throws IOException {
 
 		long start = System.currentTimeMillis();
-		
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("type", "java.lang.String");
-        map.put("value", URLEncoder.encode(content, "utf-8"));
-        
-        List<Map<String, Object>> args = Collections.singletonList(map);
-
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("isPassedBy", "true"));
-        params.add(new BasicNameValuePair("arguments", toJsonString(args)));
-
+		 
+        StringEntity entity = new StringEntity(content, ContentType.APPLICATION_JSON);
 		HttpPost httpPost = null;
 		
 		try {
 			
 			HttpClient httpClient = HttpClientFactory.getHttpClient();
-			httpPost = new HttpPost(ES_URL+"/"+service);
-			
-			httpPost.setEntity(new UrlEncodedFormEntity(params, "utf-8"));
+
+			httpPost = new HttpPost(getLoadBalanceUrl()+"/"+service);
+			httpPost.setEntity(entity);
+
 			HttpResponse httpResponse = httpClient.execute(httpPost);
       
 			int status = httpResponse.getStatusLine().getStatusCode();
 			String result = EntityUtils.toString(httpResponse.getEntity());
-			if(status != 200) {
+			if(!Pattern.matches("2\\d\\d", String.valueOf(status))) {
 				logger.error("任务["+content+"]==>"+service+"失败,"+"响应状态["+status+"],"+"响应内容["+result+"]");
 				return null;
 			}
@@ -186,13 +210,7 @@ public class EsJobLogger implements JobLogger
     public PaginationRsp<JobLogPo> search(JobLoggerRequest request) {
 		
         PaginationRsp<JobLogPo> response = new PaginationRsp<JobLogPo>();
-        
-    	//eg:第一页(0,10)传送0，第二页(10,10)传送1....
-    	Integer pageNum = request.getStart();
-    	if(pageNum!=0){
-    		pageNum = request.getStart()/request.getLimit();
-    	}
-    	
+    
     	if(null!=request.getStartLogTime()){
     		request.setStartLogTimeMill(request.getStartLogTime().getTime());
     	}
@@ -200,62 +218,99 @@ public class EsJobLogger implements JobLogger
     	if(null!=request.getEndLogTime()){
     		request.setEndLogTimeMill(request.getEndLogTime().getTime());
     	}
-    	
-    	Map<String,Object> map = new HashMap<String,Object>();
-    	map.put("pageSize",request.getLimit());
-    	map.put("pageNum",pageNum);
-    	map.put("parameter",request);
-
     	try {
+    		JSONArray must = new JSONArray();
+    		Field[] fields = JobLoggerRequest.class.getDeclaredFields();
+    		for(Field field : fields) {
+    			field.setAccessible(true);
+    			EsLogFilter filter = field.getAnnotation(EsLogFilter.class);
+    			if(filter!=null) {
+    				Object value = field.get(request);
+    				if(!isEmpty(value)) {
+    					if(Optype.Term.equals(filter.opType())) {
+    						must.add(json("term", json(filter.name(), value)));
+    					} else {
+    						must.add(json("range", json(filter.name(), json(filter.extra(), value))));
+    					}
+    				}
+    			}
+    		}
     		
-			String count = submitSync("count", toJsonString(map));
-			
-			if(StringUtils.isEmpty(count) || count.equals("0")) {	
-				response.setRows(Collections.<JobLogPo> emptyList());
-				return response;
-			}
-			
-			String searchResult = submitSync("query", toJsonString(map));
-			
-			List<JobLogPo> rows = new ArrayList<JobLogPo>();
-			JSONArray jobLogPoList= JSONArray.fromObject(searchResult);
-			
-			//返回的extParams不是标准json对象格式
-			if (jobLogPoList!=null && !jobLogPoList.isEmpty()) {
-				
-				for (Object o : jobLogPoList) {
-					JobLogPo po = (JobLogPo)JSONObject.toBean((JSONObject)o, JobLogPo.class);
-					rows.add(po);
-				}
-				
-			}
-			
-			response.setResults(Long.valueOf(count).intValue());
-			response.setRows(rows);
+    		JSONObject search = new JSONObject();
+    		search.put("from", request.getStart());
+    		search.put("size", request.getLimit());
+    		
+        	if(must.size() > 0) {
+        		search.put("query", json("filtered", json("filter", json("bool", json("must", must)))));
+        	} else {
+        		search.put("query", json("match_all", new JSONObject()));
+        	}
+    		
+        	
+        	String result = submitSync(EsOpType.SEARCH.getValue(), JSON.toJSONString(search));
+        	if(result!=null) {
+
+        		List<JobLogPo> rows = new ArrayList<JobLogPo>();
+        		
+        		JSONObject hits = JSONObject.parseObject(result).getJSONObject("hits");
+        		JSONArray hitDocs = hits.getJSONArray("hits");
+        		
+        		for(Object hitDoc : hitDocs) {
+        			JobLogPo jobLogPo = JSON.parseObject(((JSONObject)hitDoc).getJSONObject("_source").toString(), JobLogPo.class);
+        			rows.add(jobLogPo);
+        		}
+        		
+        		response.setRows(rows);
+        		response.setResults(hits.getIntValue("total"));
+        		
+        	}
+        	
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			logger.info("查询第"+pageNum+"页日志失败", e);
+			logger.info("日志查询失败", e);
 		}
     
 		return response;
     
 	}
 	
-	public <T> String toJsonString(T object) {
+    private String getLoadBalanceUrl() {
+    	
+    	String[] urls = ES_URL.split(",");
+    	
+    	Random random = new Random();
+    	
+    	return urls[random.nextInt(urls.length)];
+    	
+    }
+    
+	private JSONObject json(String key, Object value) {
 		
-		String result = null;
+		JSONObject json = new JSONObject();
 		
-		ObjectMapper mapper = new ObjectMapper();
+		json.put(key, value);
 		
-		try {
-			result = mapper.writeValueAsString(object);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			throw new RuntimeException(e);
+		return json;
+		
+	}
+	
+	private boolean isEmpty(Object value) {
+		
+		if(value == null) {
+			return true;
 		}
 		
-		return result;
+		if(value instanceof Number) {
+			return value.equals(0);
+		}
+		
+		if(value instanceof String) {
+			return StringUtils.isEmpty((String)value);
+		}
+		
+		return false;
+		
 	}
 
 }

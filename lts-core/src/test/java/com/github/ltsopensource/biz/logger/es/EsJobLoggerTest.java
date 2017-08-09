@@ -21,7 +21,10 @@ import com.alibaba.fastjson.JSON;
 import com.github.ltsopensource.admin.response.PaginationRsp;
 import com.github.ltsopensource.biz.logger.domain.JobLogPo;
 import com.github.ltsopensource.biz.logger.domain.JobLoggerRequest;
+import com.github.ltsopensource.biz.logger.domain.LogType;
 import com.github.ltsopensource.core.cluster.Config;
+import com.github.ltsopensource.core.constant.Level;
+import com.github.ltsopensource.core.domain.JobType;
 import com.github.ltsopensource.json.JSONObject;
 
 public class EsJobLoggerTest {
@@ -31,28 +34,60 @@ public class EsJobLoggerTest {
 	@BeforeClass
 	public static void init() {
 		Config config = new Config();
-		config.getParameters().put("es.log.url", "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService");
+//		config.getParameters().put("es.log.url", "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService");
+		config.getParameters().put("es.log.url", "http://192.168.0.105:9200/test/type1");
+		
 		logger = new EsJobLogger(config);
 	}
 	
 	@Test
 	public void testSave() {
 		
+		Map<String, String> params = new HashMap<String, String>();
+		Map<String, String> inner = new HashMap<String, String>();
+		inner.put("中华人名共和国", "中华人名共和国");
+		params.put("华夏子民", inner.toString());
+		
+		Map<String, String> params1 = new HashMap<String, String>();
+		Map<String, String> inner1 = new HashMap<String, String>();
+		inner1.put("中华人名共和国", "中华人名共和国");
+		params1.put("华夏子民", inner1.toString());
+		
 		JobLogPo log = new JobLogPo();
-		log.setRealTaskId("991000014512");
 		log.setBizId("0000");
-		log.setBizType("saveOneBizType");
-		log.setEventType("saveOneEventType");
+		log.setBizType("save One BizType");
+		log.setCronExpression("cron表达式123");
+		log.setDepPreCycle(true);
+		log.setEventType("saveOneEventType1");
+		log.setExtParams(null);
+		log.setGmtCreated(System.currentTimeMillis());
+		log.setInternalExtParams(params1);
+		log.setJobId("jobId");
+		log.setJobType(JobType.REAL_TIME);
+		log.setLevel(Level.INFO);
 		log.setLogTime(new Date().getTime());
-		log.setMsg("saveOne.msg.test");
+		log.setLogType(LogType.BIZ);
+		log.setMaxRetryTimes(10);
+		log.setMsg("saveOne.msg.test中文");
 		log.setNeedFeedback(true);
 		log.setPriority(5);
-    	
+		log.setRealTaskId("991000014512");
+		log.setRepeatCount(10);
+		log.setRepeatedCount(20);
+		log.setRepeatInterval(30L);
+		log.setRetryTimes(3);
+		log.setSubmitNodeGroup("submitNode");
+		log.setSuccess(true);
+		log.setTaskId("taskId");
+		log.setTaskTrackerIdentity("taskTrackerIdentity");
+		log.setTaskTrackerNodeGroup("trackerNodeGroup");
+		log.setTriggerTime(System.currentTimeMillis());
+		
     	logger.log(log);
 	
 		CountDownLatch latch = new CountDownLatch(1);
 		try {
-			latch.await(5000, TimeUnit.MILLISECONDS);
+			latch.await(500000, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -80,7 +115,6 @@ public class EsJobLoggerTest {
 			
 		}
 		
-		EsJobLogger logger = new EsJobLogger(null);
 		logger.log(jobLogPos);
 	
 		CountDownLatch latch = new CountDownLatch(1);
@@ -98,11 +132,11 @@ public class EsJobLoggerTest {
 		
 		Config config = new Config();
 		config.getParameters().put("es.log.url", "http://super.lvmama.com/dubbo-rest/generic/com.lvmama.bigger.biz.service.IESLtsSyncLogService");
-		logger = new EsJobLogger(config);
+//		logger = new EsJobLogger(config);
 		JobLoggerRequest request = new JobLoggerRequest();
 		request.setStart(0);
 		request.setLimit(10);
-		request.setRealTaskId("sss991000014512");
+		request.setRealTaskId("99100001452");
 		
 		PaginationRsp<JobLogPo> result = logger.search(request);
 		System.out.println(JSON.toJSON(result));
@@ -110,7 +144,7 @@ public class EsJobLoggerTest {
 	}
 	
 	@Test
-	public void testFuse() {
+	public void testRefuse() {
 		
 		ThreadPoolExecutor executer = new ThreadPoolExecutor(20, 100, 100, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(100));
 		
