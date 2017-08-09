@@ -129,7 +129,6 @@ public abstract class AbstractPreLoader implements PreLoader {
     private JobPo get(String taskTrackerNodeGroup) {
 
         JobPriorityBlockingDeque queue = getQueue(taskTrackerNodeGroup);
-        logger.info("jobQueueSize:"+queue.size());
 
         if (queue.size() / loadSize < factor) {
             // 触发加载的请求
