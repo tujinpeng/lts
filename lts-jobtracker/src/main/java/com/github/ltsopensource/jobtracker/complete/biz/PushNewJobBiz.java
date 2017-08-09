@@ -1,10 +1,12 @@
 package com.github.ltsopensource.jobtracker.complete.biz;
 
+import com.github.ltsopensource.core.logger.LoggerFactory;
 import com.github.ltsopensource.core.protocol.command.JobCompletedRequest;
 import com.github.ltsopensource.core.protocol.command.JobPushRequest;
-import com.github.ltsopensource.jobtracker.domain.JobTrackerAppContext;
-import com.github.ltsopensource.jobtracker.sender.JobSender;
 import com.github.ltsopensource.core.support.JobDomainConverter;
+import com.github.ltsopensource.jobtracker.domain.JobTrackerAppContext;
+import com.github.ltsopensource.jobtracker.monitor.JobTrackerMStatReporter;
+import com.github.ltsopensource.jobtracker.sender.JobSender;
 import com.github.ltsopensource.queue.domain.JobPo;
 import com.github.ltsopensource.remoting.protocol.RemotingCommand;
 import com.github.ltsopensource.remoting.protocol.RemotingProtos;
@@ -17,9 +19,13 @@ import com.github.ltsopensource.remoting.protocol.RemotingProtos;
 public class PushNewJobBiz implements JobCompletedBiz {
 
     private JobTrackerAppContext appContext;
+    
+    private JobTrackerMStatReporter stat;
+
 
     public PushNewJobBiz(JobTrackerAppContext appContext) {
         this.appContext = appContext;
+        this.stat = (JobTrackerMStatReporter) appContext.getMStatReporter();
     }
 
     @Override
@@ -29,6 +35,10 @@ public class PushNewJobBiz implements JobCompletedBiz {
             try {
                 // 查看有没有其他可以执行的任务
                 JobPushRequest jobPushRequest = getNewJob(request.getNodeGroup(), request.getIdentity());
+                if(jobPushRequest!=null) {
+                    stat.incPushJobNum();
+                    LoggerFactory.getLogger(PushNewJobBiz.class).warn("isReceiveNewJob");
+                }
                 // 返回 新的任务
                 return RemotingCommand.createResponseCommand(RemotingProtos.ResponseCode.SUCCESS.code(), jobPushRequest);
             } catch (Exception ignored) {
