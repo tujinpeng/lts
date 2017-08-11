@@ -2,10 +2,14 @@ package com.github.ltsopensource.biz.logger.es;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -20,17 +24,19 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.ltsopensource.admin.response.PaginationRsp;
+import com.github.ltsopensource.alarm.email.EmailAlarmMessage;
+import com.github.ltsopensource.alarm.email.EmailAlarmNotifier;
 import com.github.ltsopensource.biz.logger.JobLogger;
 import com.github.ltsopensource.biz.logger.domain.JobLogPo;
 import com.github.ltsopensource.biz.logger.domain.JobLoggerRequest;
 import com.github.ltsopensource.biz.logger.es.annotation.EsLogFilter;
 import com.github.ltsopensource.biz.logger.es.annotation.EsLogFilter.Optype;
-import com.github.ltsopensource.biz.logger.es.util.EsFailCntClearTimer;
 import com.github.ltsopensource.biz.logger.es.util.HttpClientFactory;
 import com.github.ltsopensource.biz.logger.es.util.ThreadPoolFactory;
 import com.github.ltsopensource.core.cluster.Config;
 import com.github.ltsopensource.core.commons.utils.CollectionUtils;
 import com.github.ltsopensource.core.commons.utils.StringUtils;
+import com.github.ltsopensource.core.constant.ExtConfig;
 import com.github.ltsopensource.core.logger.Logger;
 import com.github.ltsopensource.core.logger.LoggerFactory;
 
@@ -43,11 +49,19 @@ public class EsJobLogger implements JobLogger
 	
 	private AtomicInteger failCount = new AtomicInteger(0);
 	
-	private volatile boolean isShutDown;
+	private AtomicBoolean isShutDown = new AtomicBoolean();
 	
-	private Timer timer;
+	private Timer timer = new Timer();
+	
+	private TimerTask failCntClearTask;
 	
 	private final String Delimiters = "\n";
+	
+	private EmailAlarmNotifier alarmNotifier;
+	
+	private String alarmEmail;
+	
+	private String nodeAddress;
 	
 	private enum EsOpType {
 		
@@ -71,11 +85,16 @@ public class EsJobLogger implements JobLogger
 	
 	public EsJobLogger(Config config) {
 		
-		timer = new Timer();
-		timer.scheduleAtFixedRate(new EsFailCntClearTimer(failCount), 1000, 60*1000);
-		
 		ES_URL = config.getParameter("es.log.url");
+
+		alarmNotifier = new EmailAlarmNotifier(config);
 		
+		alarmEmail = config.getParameter(ExtConfig.ALARM_EMAIL_TO);
+		
+		nodeAddress = config.getIp();
+		
+		startFixedRateClean();
+    
 	}
 
 	@Override
@@ -129,7 +148,7 @@ public class EsJobLogger implements JobLogger
 
     public void submitAsync(final String service, final String content) {
     	
-    	if(!isShutDown) {
+    	if(!isShutDown.get()) {
     		
     		//异步处理+熔断控制
     		try {
@@ -143,19 +162,44 @@ public class EsJobLogger implements JobLogger
 							submitSync(service, content);
 							
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
+							
 							logger.error("任务["+content+"]==>"+service+"失败", e);
 							
-							if(failCount.getAndIncrement() > 30) {
+							if(failCount.getAndIncrement() > 50) {
 								
-								isShutDown = true;
+								if(isShutDown.compareAndSet(false, true)) {
+									
+									failCntClearTask.cancel();
+									
+									//恢复重试
+									timer.schedule(new TimerTask() {
+										
+										@Override
+										public void run() {
+											failCount.getAndSet(0);
+											startFixedRateClean();
+											isShutDown.compareAndSet(true, false);
+										}
+										
+									}, 5*60*1000);
+									
+									logger.error("ES日志服务熔断");
+									
+									if(StringUtils.isNotEmpty(alarmEmail)) {
+
+										SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+										EmailAlarmMessage message = new EmailAlarmMessage();
+										message.setTitle("LTS-ES日志服务预警");
+										message.setMsg("JobTracker-"+nodeAddress+"节点于"+dateFormat.format(new Date())+"发生ES日志服务熔断，请确认！");
+										message.setTo(alarmEmail);
+										
+										alarmNotifier.notice(message);
+									}
+
+								}
 								
-								timer.cancel();
-								
-								logger.error("日志写入ES服务关闭");
-							
 							}
-							
+					
 						}
 					}
 				});
@@ -311,6 +355,21 @@ public class EsJobLogger implements JobLogger
 		
 		return false;
 		
+	}
+	
+	private void startFixedRateClean() {
+		
+		failCntClearTask = new TimerTask() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				failCount.getAndSet(0);
+			}
+		};
+	
+		timer.scheduleAtFixedRate(failCntClearTask, 60*1000, 60*1000);
+
 	}
 
 }
