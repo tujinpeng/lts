@@ -68,7 +68,7 @@ public class SMTPMailManagerImpl implements MailManager {
         // Set From: header field of the header.
         mimeMessage.setFrom(new InternetAddress(adminAddress));
         // Set To: header field of the header.
-        mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+        mimeMessage.addRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
         // Set Subject: header field
         mimeMessage.setSubject(title);
         // Now set the actual message

@@ -14,11 +14,14 @@ public class EmailAlarmNotifier extends AbstractAlarmNotifier<EmailAlarmMessage>
     private MailManager mailManager;
 
     public EmailAlarmNotifier(AppContext appContext) {
-        this.mailManager = getMailManager(appContext);
+        this.mailManager = getMailManager(appContext.getConfig());
     }
-
-    private MailManager getMailManager(AppContext appContext) {
-        Config config = appContext.getConfig();
+    
+    public EmailAlarmNotifier(Config config) {
+    	this.mailManager = getMailManager(config);
+    }
+    
+    private MailManager getMailManager(Config config) {
         String host = config.getParameter(ExtConfig.MAIL_SMTP_HOST);
         String port = config.getParameter(ExtConfig.MAIL_SMTP_PORT);
         String userName = config.getParameter(ExtConfig.MAIL_USERNAME);
@@ -27,6 +30,7 @@ public class EmailAlarmNotifier extends AbstractAlarmNotifier<EmailAlarmMessage>
         boolean sslEnabled = config.getParameter(ExtConfig.MAIL_SSL_ENABLED, true);
         return new SMTPMailManagerImpl(host, port, userName, password, adminAddress, sslEnabled);
     }
+    
 
     @Override
     protected void doNotice(EmailAlarmMessage message) {

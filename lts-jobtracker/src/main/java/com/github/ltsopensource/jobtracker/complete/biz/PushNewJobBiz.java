@@ -1,6 +1,5 @@
 package com.github.ltsopensource.jobtracker.complete.biz;
 
-import com.github.ltsopensource.core.logger.LoggerFactory;
 import com.github.ltsopensource.core.protocol.command.JobCompletedRequest;
 import com.github.ltsopensource.core.protocol.command.JobPushRequest;
 import com.github.ltsopensource.core.support.JobDomainConverter;
@@ -37,7 +36,6 @@ public class PushNewJobBiz implements JobCompletedBiz {
                 JobPushRequest jobPushRequest = getNewJob(request.getNodeGroup(), request.getIdentity());
                 if(jobPushRequest!=null) {
                     stat.incPushJobNum();
-                    LoggerFactory.getLogger(PushNewJobBiz.class).warn("isReceiveNewJob");
                 }
                 // 返回 新的任务
                 return RemotingCommand.createResponseCommand(RemotingProtos.ResponseCode.SUCCESS.code(), jobPushRequest);
