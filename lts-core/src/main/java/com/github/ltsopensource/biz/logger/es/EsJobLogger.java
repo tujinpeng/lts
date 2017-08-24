@@ -89,7 +89,7 @@ public class EsJobLogger implements JobLogger
 
 		alarmNotifier = new EmailAlarmNotifier(config);
 		
-		alarmEmail = config.getParameter(ExtConfig.ALARM_EMAIL_TO);
+		alarmEmail = config.getParameter(ExtConfig.ES_ALARM_EMAIL);
 		
 		nodeAddress = config.getIp();
 		

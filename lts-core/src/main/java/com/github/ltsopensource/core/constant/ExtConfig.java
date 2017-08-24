@@ -243,5 +243,9 @@ public interface ExtConfig {
      */
     String TASK_WORK_THREAD = "lts.task.work.thread";
     
+    /**
+     * ES日志服务报警地址
+     */
+    String ES_ALARM_EMAIL = "es.alarm.email";
     
 }
