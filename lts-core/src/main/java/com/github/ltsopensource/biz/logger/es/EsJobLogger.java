@@ -283,6 +283,7 @@ public class EsJobLogger implements JobLogger
     		JSONObject search = new JSONObject();
     		search.put("from", request.getStart());
     		search.put("size", request.getLimit());
+    		search.put("sort", json("logTime", json("order", "desc")));
     		
         	if(must.size() > 0) {
         		search.put("query", json("filtered", json("filter", json("bool", json("must", must)))));
